@@ -1,15 +1,16 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
-  --color-luxury-gold: #b89a6a;
-  --color-luxury-cream: #f9f6f2;
-  --color-luxury-ink: #1a1410;
-  
-  --font-serif: "Cormorant Garamond", serif;
-  --font-sans: "Montserrat", sans-serif;
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
 
-/* เพิ่ม Smooth Scroll ให้เว็บดูแพงขึ้น */
-html {
-  scroll-behavior: smooth;
+  /* Custom CSS variables — ใช้แทน @theme ของ Tailwind v4 */
+  :root {
+    --color-luxury-gold: #b89a6a;
+    --color-luxury-cream: #f9f6f2;
+    --color-luxury-ink: #1a1410;
+  }
 }
