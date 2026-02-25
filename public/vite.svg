@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
+
+  <!-- Pastel circle background -->
+  <circle cx="128" cy="128" r="120" fill="#D4E4ED"/>
+
+  <!-- Elegant serif N — drawn as path -->
+  <!-- Left stem -->
+  <path d="M72 60 L72 196 L96 196 L96 60 Z" fill="white"/>
+  <!-- Right stem -->
+  <path d="M160 60 L160 196 L184 196 L184 60 Z" fill="white"/>
+  <!-- Diagonal -->
+  <path d="M96 60 L184 196 L160 196 L72 60 Z" fill="white" opacity="0.9"/>
+
+  <!-- Serifs top-left -->
+  <rect x="56" y="60" width="56" height="14" rx="3" fill="white"/>
+  <!-- Serifs bottom-left -->
+  <rect x="56" y="182" width="56" height="14" rx="3" fill="white"/>
+  <!-- Serifs top-right -->
+  <rect x="144" y="60" width="56" height="14" rx="3" fill="white"/>
+  <!-- Serifs bottom-right -->
+  <rect x="144" y="182" width="56" height="14" rx="3" fill="white"/>
+
+</svg>
