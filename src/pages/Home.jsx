@@ -1,19 +1,40 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import WomanImg1 from '../img/home/woman1.jpg'; 
 import WomanImg2 from '../img/home/1.JPG';
 import WomanImg3 from '../img/home/2.JPG';
 import WomanImg4 from '../img/home/3.JPG';
 import { Link } from 'react-router-dom';
 
+// ── Progressive image: skeleton → fade in เมื่อโหลดเสร็จ ──
+const ProgressiveImg = ({ src, alt, className, style }) => {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%', background: '#e8dfd2' }}>
+      <img
+        src={src}
+        alt={alt}
+        className={className}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        style={{
+          ...style,
+          opacity: loaded ? 1 : 0,
+          transition: 'opacity 0.6s ease',
+        }}
+      />
+    </div>
+  );
+};
+
 const Home = () => {
   const heroRef = useRef(null);
+  const [heroLoaded, setHeroLoaded] = useState(false);
 
   useEffect(() => {
     const el = heroRef.current;
     if (!el) return;
-    requestAnimationFrame(() => {
-      el.classList.add('loaded');
-    });
+    requestAnimationFrame(() => el.classList.add('loaded'));
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -37,72 +58,63 @@ const Home = () => {
           --cream: #f9f6f2;
         }
 
-        .home-page { background-color: var(--white); scroll-behavior: smooth; }
+        .home-page { background-color: var(--white); }
 
-        /* ─── FULLSCREEN HERO ─── */
+        /* ─── HERO ─── */
         .hero-fullscreen {
           position: relative;
-          height: 100vh;
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-          color: var(--white);
+          height: 100vh; width: 100%;
+          display: flex; align-items: center; justify-content: center;
+          overflow: hidden; color: var(--white);
+          /* skeleton bg ขณะรอรูปโหลด */
+          background: #1a1410;
         }
 
-        .hero-bg-wrapper { position: absolute; inset: 0; z-index: 1; }
-        .hero-bg-image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          object-position: center 20%;
-          transform: scale(1.1);
-          transition: transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
+        .hero-bg-wrapper {
+          position: absolute; inset: 0; z-index: 1;
+          will-change: transform;
         }
-        .loaded .hero-bg-image { transform: scale(1); }
+        .hero-bg-image {
+          width: 100%; height: 100%;
+          object-fit: cover; object-position: center 20%;
+          transform: translate3d(0, 20px, 0);
+          transition: transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
+          will-change: transform;
+          /* opacity จัดการโดย ProgressiveImg */
+        }
+        .loaded .hero-bg-image { transform: translate3d(0, 0, 0); }
+
         .hero-overlay {
-          position: absolute;
-          inset: 0;
+          position: absolute; inset: 0;
           background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.1), rgba(0,0,0,0.5));
           z-index: 2;
         }
 
         .hero-content {
-          position: relative;
-          z-index: 3;
-          text-align: center;
-          padding: 0 2rem;
-          opacity: 0;
-          transform: translateY(30px);
-          transition: all 1.5s ease 0.5s;
+          position: relative; z-index: 3;
+          text-align: center; padding: 0 2rem;
+          opacity: 0; transform: translate3d(0, 30px, 0);
+          transition: opacity 1.5s ease 0.5s, transform 1.5s ease 0.5s;
+          will-change: opacity, transform;
         }
-        .loaded .hero-content { opacity: 1; transform: translateY(0); }
+        .loaded .hero-content { opacity: 1; transform: translate3d(0, 0, 0); }
 
         .hero-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: clamp(3rem, 10vw, 7rem);
-          font-weight: 300;
-          line-height: 0.9;
-          margin-bottom: 2rem;
+          font-weight: 300; line-height: 0.9; margin-bottom: 2rem;
         }
         .hero-title em { font-style: italic; color: var(--gold); }
-
         .hero-subtitle {
-          font-size: 0.75rem;
-          letter-spacing: 0.5em;
-          text-transform: uppercase;
-          margin-bottom: 1.5rem;
-          display: block;
+          font-size: 0.75rem; letter-spacing: 0.5em;
+          text-transform: uppercase; margin-bottom: 1.5rem; display: block;
         }
 
-        /* ─── SHOWCASE SECTION ─── */
+        /* ─── SHOWCASE ─── */
         .showcase-section {
           padding: 100px 5%;
-          max-width: 1400px;
-          margin: 0 auto;
+          max-width: 1400px; margin: 0 auto;
         }
-
         .services-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -110,82 +122,73 @@ const Home = () => {
         }
 
         .service-card {
-          position: relative;
-          height: 75vh;
-          overflow: hidden;
-          opacity: 0;
-          transform: translateY(40px);
-          transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
-          
-          /* --- จุดที่แก้ไข: เพิ่มขอบมนที่นี่ --- */
-          border-radius: 30px; 
-          box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+          position: relative; height: 75vh; overflow: hidden;
+          border-radius: 30px;
+          opacity: 0; transform: translate3d(0, 40px, 0);
+          transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+          will-change: opacity, transform;
+          /* skeleton bg ขณะรอรูปโหลด */
+          background: #e8dfd2;
         }
-        .service-card.reveal { opacity: 1; transform: translateY(0); }
+        .service-card::after {
+          content: ''; position: absolute; inset: 0;
+          border-radius: 30px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+          pointer-events: none; z-index: 3;
+        }
+        .service-card.reveal { opacity: 1; transform: translate3d(0, 0, 0); }
 
         .service-card img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: transform 1.2s ease;
+          width: 100%; height: 100%; object-fit: cover;
+          transform: translate3d(0,0,0) scale(1);
+          transition: transform 1.2s ease, opacity 0.6s ease;
+          will-change: transform;
         }
-        .service-card:hover img { transform: scale(1.1); }
+        .service-card:hover img { transform: translate3d(0,0,0) scale(1.06); }
 
         .service-overlay-content {
-          position: absolute;
-          inset: 0;
+          position: absolute; inset: 0;
           background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%);
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-end;
-          padding: 40px;
-          transition: background 0.4s ease;
+          display: flex; flex-direction: column;
+          justify-content: flex-end; padding: 40px;
+          transition: background 0.4s ease; z-index: 2;
         }
         .service-card:hover .service-overlay-content { background: rgba(0,0,0,0.4); }
 
         .service-label h3 {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 2.5rem;
-          color: white;
-          margin-bottom: 15px;
-          font-weight: 300;
+          font-size: 2.5rem; color: white;
+          margin-bottom: 15px; font-weight: 300;
         }
 
         .view-more-btn {
-          align-self: flex-start;
-          color: white;
-          text-decoration: none;
-          font-size: 0.65rem;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
+          align-self: flex-start; color: white; text-decoration: none;
+          font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
           border: 1px solid rgba(255,255,255,0.4);
-          padding: 12px 24px;
-          /* ปรับปุ่มให้โค้งมนด้วยเพื่อให้เข้ากับภาพ */
-          border-radius: 50px;
-          transition: all 0.3s ease;
+          padding: 12px 24px; border-radius: 50px;
+          transition: background 0.3s ease, color 0.3s ease;
         }
-        .view-more-btn:hover {
-          background: white;
-          color: var(--ink);
-        }
+        .view-more-btn:hover { background: white; color: var(--ink); }
 
         .scroll-down {
-          position: absolute;
-          bottom: 40px;
-          left: 50%;
-          transform: translateX(-50%);
-          z-index: 3;
-          color: white;
-          text-decoration: none;
-          text-align: center;
-          font-size: 0.6rem;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          opacity: 0.8;
+          position: absolute; bottom: 40px; left: 50%;
+          transform: translateX(-50%); z-index: 3;
+          color: white; text-decoration: none;
+          text-align: center; font-size: 0.6rem;
+          letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.8;
         }
-
-        .line { width: 1px; height: 50px; background: white; margin: 10px auto; animation: scrolldown 2s infinite; }
-        @keyframes scrolldown { 0%{transform: scaleY(0); transform-origin: top;} 50%{transform: scaleY(1); transform-origin: top;} 51%{transform: scaleY(1); transform-origin: bottom;} 100%{transform: scaleY(0); transform-origin: bottom;} }
+        .line {
+          width: 1px; height: 50px; background: white;
+          margin: 10px auto; will-change: transform;
+          animation: scrolldown 2s infinite;
+        }
+        @keyframes scrolldown {
+          0%   { transform: scaleY(0); transform-origin: top; }
+          50%  { transform: scaleY(1); transform-origin: top; }
+          51%  { transform: scaleY(1); transform-origin: bottom; }
+          100% { transform: scaleY(0); transform-origin: bottom; }
+        }
 
         @media (max-width: 1024px) {
           .services-grid { grid-template-columns: 1fr; }
@@ -194,11 +197,20 @@ const Home = () => {
       `}</style>
 
       <div className="home-page" ref={heroRef}>
-        
+
         {/* SECTION 1: HERO */}
         <section className="hero-fullscreen">
           <div className="hero-bg-wrapper">
-            <img src={WomanImg1} alt="Breathtaking Visual" className="hero-bg-image" />
+            {/* Hero ใช้ progressive load — skeleton สีเข้มรอก่อน */}
+            <img
+              src={WomanImg1}
+              alt="Breathtaking Visual"
+              className="hero-bg-image"
+              decoding="async"
+              fetchpriority="high"
+              onLoad={() => setHeroLoaded(true)}
+              style={{ opacity: heroLoaded ? 1 : 0, transition: 'opacity 0.8s ease' }}
+            />
             <div className="hero-overlay" />
           </div>
 
@@ -207,7 +219,13 @@ const Home = () => {
             <h1 className="hero-title">
               The Art of <em>Natural</em><br />Glamour
             </h1>
-            <Link to="https://lin.ee/aZQJ4JQ" className="view-more-btn" style={{alignSelf: 'center', borderColor: 'white'}}>Book an Experience</Link>
+            <Link
+              to="https://lin.ee/aZQJ4JQ"
+              className="view-more-btn"
+              style={{ alignSelf: 'center', borderColor: 'white' }}
+            >
+              Book an Experience
+            </Link>
           </div>
 
           <a href="#work" className="scroll-down">
@@ -216,39 +234,33 @@ const Home = () => {
           </a>
         </section>
 
-        {/* SECTION 2: SHOWCASE (3 ภาพที่ขอบมน) */}
+        {/* SECTION 2: SHOWCASE */}
         <section className="showcase-section" id="work">
           <div className="services-grid">
-            
+
             {/* Wedding Makeup */}
             <div className="service-card scroll-reveal">
-              <img src={WomanImg2} alt="Wedding Makeup" />
+              <CardImage src={WomanImg2} alt="Wedding Makeup" />
               <div className="service-overlay-content">
-                <div className="service-label">
-                  <h3>Wedding Makeup</h3>
-                </div>
+                <div className="service-label"><h3>Wedding Makeup</h3></div>
                 <Link to="/wedding" className="view-more-btn">Explore Diary</Link>
               </div>
             </div>
 
             {/* Diary Makeup */}
             <div className="service-card scroll-reveal" style={{ transitionDelay: '0.2s' }}>
-              <img src={WomanImg3} alt="Diary Makeup" />
+              <CardImage src={WomanImg3} alt="Diary Makeup" />
               <div className="service-overlay-content">
-                <div className="service-label">
-                  <h3>Diary Makeup</h3>
-                </div>
+                <div className="service-label"><h3>Diary Makeup</h3></div>
                 <Link to="/daily" className="view-more-btn">View Collection</Link>
               </div>
             </div>
 
-            {/* Editorial / Portfolio */}
+            {/* All Works */}
             <div className="service-card scroll-reveal" style={{ transitionDelay: '0.4s' }}>
-              <img src={WomanImg4} alt="Portfolio" />
+              <CardImage src={WomanImg4} alt="Portfolio" />
               <div className="service-overlay-content">
-                <div className="service-label">
-                  <h3>All Works</h3>
-                </div>
+                <div className="service-label"><h3>All Works</h3></div>
                 <Link to="/all" className="view-more-btn">View All</Link>
               </div>
             </div>
@@ -258,6 +270,27 @@ const Home = () => {
 
       </div>
     </>
+  );
+};
+
+// Card image — skeleton cream → fade in เมื่อโหลดเสร็จ
+const CardImage = ({ src, alt }) => {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      onLoad={() => setLoaded(true)}
+      style={{
+        width: '100%', height: '100%', objectFit: 'cover',
+        opacity: loaded ? 1 : 0,
+        transform: 'translate3d(0,0,0) scale(1)',
+        transition: 'opacity 0.6s ease, transform 1.2s ease',
+        willChange: 'transform',
+      }}
+    />
   );
 };
 
