@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // ✅ Create React App (Webpack)
-const modules = import.meta.glob('../img/portfolio/*.{jpg,jpeg,png,JPG,JPEG,PNG}', { eager: true });
+const modules = import.meta.glob('../img/daily/*.{jpg,jpeg,png,JPG,JPEG,PNG}', { eager: true });
 const imagePaths = Object.keys(modules).sort();
 const imageMap = {};
 imagePaths.forEach((path) => {
