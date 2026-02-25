@@ -1,0 +1,20 @@
+<svg width="220" height="48" viewBox="0 0 220 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Circle -->
+  <circle cx="24.5" cy="24" r="22.5" fill="#B7CAD5"/>
+  <!-- Bold N -->
+  <text x="24.5" y="32"
+    text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="27"
+    font-weight="700"
+    fill="white"
+    letter-spacing="-1">N</text>
+
+  <!-- Nokmakeupp -->
+  <text x="58" y="33"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="22"
+    font-weight="400"
+    fill="#0E1112"
+    letter-spacing="0.5">Nokmakeupp</text>
+</svg>
