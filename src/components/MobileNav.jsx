@@ -7,7 +7,7 @@ const links = [
   { name: 'Home',           path: '/' },
   { name: 'Wedding Makeup', path: '/wedding' },
   { name: 'Daily Makeup',   path: '/daily' },
-  { name: 'Contact',        path: '/contact' },
+  { name: 'All Makeup',        path: '/all' },
 ];
 
 const MobileNav = () => {
