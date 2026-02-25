@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --color-luxury-gold: #b89a6a;
+  --color-luxury-cream: #f9f6f2;
+  --color-luxury-ink: #1a1410;
+  
+  --font-serif: "Cormorant Garamond", serif;
+  --font-sans: "Montserrat", sans-serif;
+}
+
+/* เพิ่ม Smooth Scroll ให้เว็บดูแพงขึ้น */
+html {
+  scroll-behavior: smooth;
+}
