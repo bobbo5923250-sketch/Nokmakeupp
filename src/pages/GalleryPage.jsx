@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FiArrowRight, FiChevronLeft, FiChevronRight, FiMessageCircle, FiX } from 'react-icons/fi';
 
 const PAGE_SIZE = 12;
+const TILE_RATIOS = ['4 / 5', '3 / 4', '1 / 1', '5 / 7', '4 / 6'];
 
 function buildColumns(items, count) {
   const columns = Array.from({ length: count }, () => []);
@@ -25,7 +26,7 @@ function MasonryTile({ src, title, globalIndex, onClick }) {
           observer.disconnect();
         }
       },
-      { threshold: 0.05, rootMargin: '120px' }
+      { threshold: 0.05, rootMargin: '420px' }
     );
 
     observer.observe(element);
@@ -39,6 +40,7 @@ function MasonryTile({ src, title, globalIndex, onClick }) {
       type="button"
       onClick={() => onClick(globalIndex)}
       style={{
+        '--tile-ratio': TILE_RATIOS[globalIndex % TILE_RATIOS.length],
         opacity: visible ? 1 : 0,
         transform: visible ? 'translate3d(0,0,0)' : 'translate3d(0,22px,0)',
       }}
@@ -48,9 +50,15 @@ function MasonryTile({ src, title, globalIndex, onClick }) {
           <img
             src={src}
             alt={`${title} ${globalIndex + 1}`}
-            loading="lazy"
+            loading={globalIndex < 6 ? 'eager' : 'lazy'}
             decoding="async"
-            onLoad={() => setLoaded(true)}
+            fetchPriority={globalIndex < 6 ? 'high' : 'auto'}
+            draggable="false"
+            onLoad={(event) => {
+              const decoded = event.currentTarget.decode?.();
+              if (decoded) decoded.finally(() => setLoaded(true));
+              else setLoaded(true);
+            }}
             style={{ opacity: loaded ? 1 : 0 }}
           />
           <span className="tile-index">{String(globalIndex + 1).padStart(2, '0')}</span>
@@ -66,6 +74,9 @@ const GalleryPage = ({ modules, eyebrow, title, accent, copy }) => {
   const sentinelRef = useRef(null);
   const [lightbox, setLightbox] = useState(null);
   const [page, setPage] = useState(1);
+  const [columnCount, setColumnCount] = useState(() => (
+    typeof window === 'undefined' || window.innerWidth > 640 ? 3 : 2
+  ));
 
   const images = useMemo(() => (
     Object.keys(modules).sort().map((path) => ({
@@ -79,13 +90,23 @@ const GalleryPage = ({ modules, eyebrow, title, accent, copy }) => {
   const progress = images.length ? (visibleImages.length / images.length) * 100 : 0;
   const columns = buildColumns(
     visibleImages.map((image, index) => ({ ...image, globalIndex: index })),
-    3
+    columnCount
   );
 
   useEffect(() => {
     const element = sectionRef.current;
     if (!element) return;
     requestAnimationFrame(() => element.classList.add('loaded'));
+  }, []);
+
+  useEffect(() => {
+    const updateColumns = () => {
+      setColumnCount(window.innerWidth <= 640 ? 2 : 3);
+    };
+
+    updateColumns();
+    window.addEventListener('resize', updateColumns);
+    return () => window.removeEventListener('resize', updateColumns);
   }, []);
 
   useEffect(() => {
@@ -118,6 +139,22 @@ const GalleryPage = ({ modules, eyebrow, title, accent, copy }) => {
     document.body.style.overflow = lightbox !== null ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [lightbox]);
+
+  useEffect(() => {
+    if (lightbox === null || images.length === 0) return;
+
+    const preloadIndexes = [
+      (lightbox + 1) % images.length,
+      (lightbox - 1 + images.length) % images.length,
+    ];
+
+    preloadIndexes.forEach((index) => {
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = images[index].src;
+      img.decode?.().catch(() => undefined);
+    });
+  }, [images, lightbox]);
 
   const lightboxSrc = lightbox !== null ? images[lightbox]?.src : null;
 
@@ -231,6 +268,7 @@ const GalleryPage = ({ modules, eyebrow, title, accent, copy }) => {
 
         .masonry-tile {
           width: 100%;
+          aspect-ratio: var(--tile-ratio);
           min-height: 120px;
           overflow: hidden;
           position: relative;
@@ -241,6 +279,21 @@ const GalleryPage = ({ modules, eyebrow, title, accent, copy }) => {
           cursor: pointer;
           transition: opacity 0.7s ease, transform 0.7s ease, box-shadow 0.28s ease;
           text-align: left;
+          content-visibility: auto;
+          contain-intrinsic-size: 360px 480px;
+        }
+
+        .masonry-tile::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(110deg, #dfd2c5 8%, #f4eadf 18%, #dfd2c5 33%);
+          background-size: 200% 100%;
+          animation: gallerySheen 1.1s linear infinite;
+        }
+
+        @keyframes gallerySheen {
+          to { background-position-x: -200%; }
         }
 
         .masonry-tile:hover {
@@ -249,10 +302,14 @@ const GalleryPage = ({ modules, eyebrow, title, accent, copy }) => {
 
         .masonry-tile img {
           width: 100%;
-          height: auto;
+          height: 100%;
           display: block;
+          object-fit: cover;
           transform: scale(1);
           transition: opacity 0.55s ease, transform 0.55s ease;
+          position: absolute;
+          inset: 0;
+          z-index: 1;
         }
 
         .masonry-tile:hover img {
@@ -265,6 +322,7 @@ const GalleryPage = ({ modules, eyebrow, title, accent, copy }) => {
           inset: 0;
           background: rgba(23, 18, 15, 0);
           transition: background 0.28s ease;
+          z-index: 1;
         }
 
         .masonry-tile:hover::after {
@@ -492,34 +550,101 @@ const GalleryPage = ({ modules, eyebrow, title, accent, copy }) => {
         }
 
         @media (max-width: 860px) {
-          .gallery-page { padding-top: 100px; }
+          .gallery-page {
+            padding: 92px 0.8rem 3rem;
+          }
           .gallery-hero {
             grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1.3rem;
           }
+
+          .gallery-title {
+            font-size: clamp(2.25rem, 11vw, 3.2rem);
+          }
+
+          .gallery-copy {
+            font-size: 0.94rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+          }
+
+          .gallery-meta {
+            gap: 0.45rem;
+          }
+
+          .gallery-pill {
+            font-size: 0.68rem;
+            padding: 0.45rem 0.65rem;
+          }
+
           .masonry { gap: 8px; }
           .masonry-col { gap: 8px; }
           .gallery-cta {
             align-items: flex-start;
             flex-direction: column;
+            margin-top: 2rem;
+            border-radius: 10px;
           }
         }
 
         @media (max-width: 560px) {
           .masonry {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            gap: 6px;
           }
-          .masonry-col:nth-child(3) { display: none; }
+
+          .masonry-tile {
+            border-radius: 7px;
+          }
+
+          .masonry-col { gap: 6px; }
+
+          .gallery-footer {
+            padding: 2rem 0 0.5rem;
+          }
+
           .line-btn { width: 100%; }
+
+          .lightbox-overlay {
+            align-items: flex-start;
+            padding: 4.4rem 0.75rem 0;
+          }
+
+          .lightbox-img {
+            max-width: 100%;
+            max-height: 56vh;
+            margin-top: 0.25rem;
+          }
+
           .lightbox-panel {
             left: 0.75rem;
             right: 0.75rem;
-            bottom: 4rem;
+            bottom: 0.75rem;
             width: auto;
+            padding: 0.9rem;
           }
+
+          .lightbox-panel h2 {
+            font-size: 1.55rem;
+          }
+
+          .lightbox-panel p {
+            font-size: 0.8rem;
+          }
+
           .lightbox-counter { bottom: 1rem; }
-          .lightbox-prev { left: 0.5rem; }
-          .lightbox-next { right: 0.5rem; }
+          .lightbox-prev {
+            left: 0.75rem;
+            top: 38vh;
+          }
+          .lightbox-next {
+            right: 0.75rem;
+            top: 38vh;
+          }
+          .lightbox-close {
+            top: 0.9rem;
+            right: 0.9rem;
+          }
         }
       `}</style>
 
@@ -579,6 +704,8 @@ const GalleryPage = ({ modules, eyebrow, title, accent, copy }) => {
               className="lightbox-img"
               src={lightboxSrc}
               alt={`${title} ${accent} ${lightbox + 1}`}
+              decoding="async"
+              draggable="false"
               onClick={(event) => event.stopPropagation()}
             />
             <button className="lightbox-btn lightbox-close" type="button" aria-label="Close" onClick={() => setLightbox(null)}><FiX /></button>

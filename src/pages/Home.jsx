@@ -60,6 +60,14 @@ const lookMoods = [
   },
 ];
 
+function warmImage(src, priority = 'low') {
+  const img = new Image();
+  img.decoding = 'async';
+  img.fetchPriority = priority;
+  img.src = src;
+  return img.decode?.().catch(() => undefined);
+}
+
 const Home = () => {
   const heroRef = useRef(null);
   const [heroLoaded, setHeroLoaded] = useState(false);
@@ -78,6 +86,24 @@ const Home = () => {
 
     document.querySelectorAll('.scroll-reveal').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const preload = document.createElement('link');
+    preload.rel = 'preload';
+    preload.as = 'image';
+    preload.href = WomanImg1;
+    preload.fetchPriority = 'high';
+    document.head.appendChild(preload);
+
+    const warmTimer = window.setTimeout(() => {
+      [WomanImg2, WomanImg3, WomanImg4].forEach((src) => warmImage(src));
+    }, 450);
+
+    return () => {
+      document.head.removeChild(preload);
+      window.clearTimeout(warmTimer);
+    };
   }, []);
 
   return (
@@ -298,6 +324,22 @@ const Home = () => {
           transition: opacity 0.8s ease, transform 0.8s ease;
         }
 
+        .service-card::before,
+        .signature-image::before,
+        .look-preview::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(110deg, #dfd2c5 8%, #f2e8dc 18%, #dfd2c5 33%);
+          background-size: 200% 100%;
+          animation: imageSheen 1.1s linear infinite;
+          z-index: 0;
+        }
+
+        @keyframes imageSheen {
+          to { background-position-x: -200%; }
+        }
+
         .service-card.reveal { opacity: 1; transform: translate3d(0, 0, 0); }
 
         .service-card img {
@@ -308,6 +350,7 @@ const Home = () => {
           inset: 0;
           transform: scale(1);
           transition: transform 0.9s ease;
+          z-index: 1;
         }
 
         .service-card:hover img { transform: scale(1.045); }
@@ -321,6 +364,7 @@ const Home = () => {
           padding: 1.4rem;
           background: linear-gradient(to top, rgba(12,9,7,0.78), rgba(12,9,7,0.06) 62%);
           color: white;
+          z-index: 2;
         }
 
         .service-panel {
@@ -452,6 +496,7 @@ const Home = () => {
           height: 100%;
           object-fit: cover;
           animation: lookFade 0.5s ease;
+          z-index: 1;
         }
 
         @keyframes lookFade {
@@ -548,6 +593,7 @@ const Home = () => {
         }
 
         .signature-image {
+          position: relative;
           aspect-ratio: 4 / 5;
           border-radius: 8px;
           overflow: hidden;
@@ -555,6 +601,8 @@ const Home = () => {
         }
 
         .signature-image img {
+          position: relative;
+          z-index: 1;
           width: 100%;
           height: 100%;
           object-fit: cover;
@@ -618,47 +666,193 @@ const Home = () => {
         }
 
         @media (max-width: 640px) {
-          .hero-fullscreen {
-            align-items: start;
-            justify-items: stretch;
-            min-height: auto;
-            overflow: visible;
-            padding: 96px 1.1rem 32px;
+          .home-page {
+            padding-bottom: 74px;
           }
+
+          .hero-fullscreen {
+            align-items: end;
+            justify-items: stretch;
+            min-height: 100svh;
+            overflow: hidden;
+            padding: 92px 1rem 1.1rem;
+          }
+
+          .hero-bg-image {
+            object-position: 43% 16%;
+          }
+
+          .hero-overlay {
+            background:
+              linear-gradient(180deg, rgba(10,8,7,0.08) 0%, rgba(10,8,7,0.28) 34%, rgba(10,8,7,0.86) 100%),
+              linear-gradient(90deg, rgba(10,8,7,0.28), rgba(10,8,7,0.08));
+          }
+
           .hero-content {
             text-align: left;
             margin-left: 0;
+            max-width: none;
+            padding: 0.2rem 0 0;
           }
+
           .hero-kicker {
             justify-content: flex-start;
+            margin-bottom: 0.75rem;
+            font-size: 0.68rem;
+            color: rgba(255,255,255,0.78);
           }
+
+          .hero-kicker::before { width: 30px; }
+
           .hero-copy {
             margin-left: 0;
+            max-width: 24rem;
+            margin-bottom: 1rem;
           }
+
           .hero-title {
-            font-size: clamp(2.35rem, 11vw, 3.7rem);
-            line-height: 1.12;
+            max-width: 20rem;
+            font-size: clamp(2.25rem, 11vw, 3.35rem);
+            line-height: 1.08;
+            margin-bottom: 0.8rem;
           }
+
           .hero-copy { font-size: 0.94rem; }
+
           .hero-actions {
+            display: grid;
+            grid-template-columns: 1fr;
             align-items: stretch;
-            justify-content: flex-start;
+            justify-content: stretch;
+            gap: 0.65rem;
           }
+
           .primary-btn,
           .ghost-btn {
             width: 100%;
+            min-height: 48px;
+            border-radius: 8px;
           }
-          .look-preview { min-height: 520px; }
-          .look-tab { grid-template-columns: auto 1fr; }
+
+          .showcase-section,
+          .look-section,
+          .signature-section,
+          .cta-section {
+            padding: 3.2rem 1rem;
+          }
+
+          .section-head {
+            gap: 0.9rem;
+            margin-bottom: 1.2rem;
+          }
+
+          .section-kicker {
+            font-size: 0.66rem;
+            margin-bottom: 0.45rem;
+          }
+
+          .section-title {
+            font-size: clamp(2rem, 10vw, 3rem);
+            line-height: 1.12;
+          }
+
+          .section-copy {
+            font-size: 0.94rem;
+            line-height: 1.75;
+          }
+
+          .services-grid {
+            gap: 0.9rem;
+          }
+
+          .service-card {
+            min-height: 460px;
+            border-radius: 10px;
+          }
+
+          .service-overlay-content {
+            padding: 1rem;
+          }
+
+          .service-panel h3 {
+            font-size: 2rem;
+          }
+
+          .service-panel p {
+            font-size: 0.92rem;
+            line-height: 1.65;
+          }
+
+          .look-studio {
+            gap: 1.25rem;
+          }
+
+          .look-tabs {
+            display: flex;
+            overflow-x: auto;
+            gap: 0.65rem;
+            margin: 1.25rem -1rem 0;
+            padding: 0 1rem 0.2rem;
+            scroll-snap-type: x proximity;
+            scrollbar-width: none;
+          }
+
+          .look-tabs::-webkit-scrollbar { display: none; }
+
+          .look-tab {
+            flex: 0 0 82%;
+            grid-template-columns: auto 1fr;
+            padding: 0.9rem;
+            scroll-snap-align: start;
+          }
+
           .look-arrow { display: none; }
-          .floating-book {
-            right: 0.8rem;
-            bottom: 0.8rem;
-            min-height: 42px;
-            padding: 0 0.85rem;
-            font-size: 0.72rem;
+
+          .look-preview {
+            min-height: 500px;
+            border-radius: 10px;
           }
-          .service-card { min-height: 470px; }
+
+          .look-card {
+            left: 0.85rem;
+            right: 0.85rem;
+            bottom: 0.85rem;
+            padding: 1rem;
+          }
+
+          .look-card h3 {
+            font-size: 2rem;
+          }
+
+          .signature-inner {
+            gap: 1.25rem;
+          }
+
+          .signature-image {
+            border-radius: 10px;
+          }
+
+          .proof-list {
+            gap: 0.75rem;
+            margin: 1.2rem 0 1.4rem;
+          }
+
+          .cta-inner {
+            gap: 1.1rem;
+          }
+
+          .floating-book {
+            left: 0.9rem;
+            right: 0.9rem;
+            bottom: 0.9rem;
+            min-height: 52px;
+            justify-content: center;
+            padding: 0 1rem;
+            border-radius: 10px;
+            background: #17120f;
+            font-size: 0.84rem;
+            box-shadow: 0 14px 32px rgba(23,18,15,0.28);
+          }
         }
       `}</style>
 
@@ -671,7 +865,12 @@ const Home = () => {
               className="hero-bg-image"
               decoding="async"
               fetchPriority="high"
-              onLoad={() => setHeroLoaded(true)}
+              draggable="false"
+              onLoad={(event) => {
+                const decoded = event.currentTarget.decode?.();
+                if (decoded) decoded.finally(() => setHeroLoaded(true));
+                else setHeroLoaded(true);
+              }}
               style={{ opacity: heroLoaded ? 1 : 0 }}
             />
           </div>
@@ -712,7 +911,7 @@ const Home = () => {
           <div className="services-grid">
             {services.map((service, index) => (
               <article className="service-card scroll-reveal" style={{ transitionDelay: `${index * 0.12}s` }} key={service.title}>
-                <img src={service.image} alt={service.title} loading="lazy" decoding="async" />
+                <img src={service.image} alt={service.title} loading={index === 0 ? 'eager' : 'lazy'} decoding="async" draggable="false" />
                 <div className="service-overlay-content">
                   <div className="service-panel">
                     <span className="service-eyebrow">{service.eyebrow}</span>
@@ -755,7 +954,7 @@ const Home = () => {
             </div>
 
             <div className="look-preview scroll-reveal">
-              <img src={lookMoods[activeLook].image} alt={lookMoods[activeLook].name} loading="lazy" decoding="async" />
+              <img src={lookMoods[activeLook].image} alt={lookMoods[activeLook].name} loading="lazy" decoding="async" draggable="false" />
               <div className="look-card">
                 <div className="look-swatches" aria-hidden="true">
                   {lookMoods[activeLook].colors.map((color) => (
@@ -775,7 +974,7 @@ const Home = () => {
         <section className="signature-section">
           <div className="signature-inner">
             <div className="signature-image scroll-reveal">
-              <img src={WomanImg2} alt="Soft bridal makeup detail" loading="lazy" decoding="async" />
+              <img src={WomanImg2} alt="Soft bridal makeup detail" loading="lazy" decoding="async" draggable="false" />
             </div>
             <div className="signature-copy scroll-reveal">
               <p className="section-kicker">Why book with us</p>
