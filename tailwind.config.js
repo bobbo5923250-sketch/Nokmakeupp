@@ -1,9 +1,9 @@
-module.exports = {
-  content: ['./src/**/*.{html,js}'],
+export default {
+  content: ['./index.html', './src/**/*.{html,js,jsx}'],
   theme: {
     fontFamily: {
-      primary: 'Playfair Display',
-      secondary: 'Mulish',
+      primary: ['Noto Serif Thai', 'serif'],
+      secondary: ['Noto Sans Thai', 'sans-serif'],
     },
     screens: {
       sm: '640px',
