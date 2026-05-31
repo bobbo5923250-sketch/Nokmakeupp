@@ -649,7 +649,15 @@ const Home = () => {
         }
 
         @media (max-width: 980px) {
-          .hero-fullscreen { align-items: end; }
+          .hero-fullscreen {
+            align-items: end;
+            padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+          }
+
+          .hero-content {
+            max-width: 620px;
+          }
+
           .services-grid,
           .look-studio,
           .signature-inner {
@@ -663,6 +671,41 @@ const Home = () => {
             flex-direction: column;
           }
           .service-panel p { min-height: auto; }
+        }
+
+        @media (min-width: 641px) and (max-width: 980px) {
+          .showcase-section,
+          .look-section,
+          .signature-section,
+          .cta-section {
+            padding: 5rem clamp(1.5rem, 5vw, 3rem);
+          }
+
+          .services-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .service-card {
+            min-height: 560px;
+          }
+
+          .service-card:nth-child(3) {
+            grid-column: 1 / -1;
+            min-height: 480px;
+          }
+
+          .look-preview {
+            min-height: 620px;
+          }
+
+          .signature-inner {
+            max-width: 760px;
+          }
+
+          .floating-book {
+            right: 1rem;
+            bottom: 1rem;
+          }
         }
 
         @media (max-width: 640px) {
@@ -852,6 +895,43 @@ const Home = () => {
             background: #17120f;
             font-size: 0.84rem;
             box-shadow: 0 14px 32px rgba(23,18,15,0.28);
+          }
+        }
+
+        @media (max-width: 380px) {
+          .hero-fullscreen {
+            padding: 84px 0.85rem 0.9rem;
+          }
+
+          .hero-title {
+            font-size: clamp(2rem, 11vw, 2.65rem);
+          }
+
+          .hero-copy,
+          .section-copy,
+          .service-panel p,
+          .look-card p,
+          .proof-list li {
+            font-size: 0.88rem;
+          }
+
+          .primary-btn,
+          .ghost-btn {
+            min-height: 46px;
+            padding-inline: 0.8rem;
+            font-size: 0.74rem;
+          }
+
+          .service-card {
+            min-height: 420px;
+          }
+
+          .look-preview {
+            min-height: 460px;
+          }
+
+          .look-tab {
+            flex-basis: 90%;
           }
         }
       `}</style>
