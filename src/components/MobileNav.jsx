@@ -41,9 +41,19 @@ const MobileNav = ({ color = '#1a1410' }) => {
         whileTap={{ scale: 0.88 }}
         onClick={() => setOpenMenu((v) => !v)}
         style={{
-          background: 'none', border: 'none', cursor: 'pointer',
-          fontSize: '1.6rem', color, padding: '6px',
+          width: '42px',
+          height: '42px',
+          background: 'rgba(255,255,255,0.12)',
+          border: '1px solid rgba(184,154,106,0.22)',
+          borderRadius: '999px',
+          cursor: 'pointer',
+          fontSize: '1.45rem',
+          color,
+          padding: '0',
           display: 'flex', alignItems: 'center',
+          justifyContent: 'center',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
         }}
       >
         <CgMenuRight />
@@ -58,19 +68,20 @@ const MobileNav = ({ color = '#1a1410' }) => {
             exit={{   opacity: 0, y: -6,  scale: 0.96 }}
             transition={{ ease: [0.4, 0, 0.2, 1], duration: 0.22 }}
             style={{
-              position: 'absolute',
-              top: 'calc(100% + 8px)',
-              right: 0,
-              minWidth: '180px',
+              position: 'fixed',
+              top: '76px',
+              left: '0.9rem',
+              right: '0.9rem',
+              minWidth: '0',
               background: 'rgba(245,240,232,0.97)',
               backdropFilter: 'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
               border: '1px solid rgba(184,154,106,0.3)',
-              borderRadius: '12px',
-              boxShadow: '0 8px 32px rgba(26,20,16,0.12)',
+              borderRadius: '16px',
+              boxShadow: '0 18px 46px rgba(26,20,16,0.16)',
               overflow: 'hidden',
               zIndex: 200,
-              transformOrigin: 'top right',
+              transformOrigin: 'top center',
             }}
           >
             {links.map((link, index) => (
@@ -85,10 +96,10 @@ const MobileNav = ({ color = '#1a1410' }) => {
                   onClick={(e) => handleLinkClick(e, link.path)}
                   style={{
                     display: 'block',
-                    padding: '0.75rem 1.25rem',
+                    padding: '1rem 1.1rem',
                     fontFamily: "'Noto Sans Thai', sans-serif",
-                    fontSize: '0.82rem',
-                    fontWeight: 500,
+                    fontSize: '0.92rem',
+                    fontWeight: 600,
                     letterSpacing: '0.04em',
                     textTransform: 'uppercase',
                     color: '#1a1410',

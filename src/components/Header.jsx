@@ -120,6 +120,22 @@ const Header = () => {
             height: 70px;
           }
         }
+
+        @media (max-width: 640px) {
+          .site-header.is-initial, .site-header.is-scrolled {
+            height: 64px;
+            padding: 0 0.9rem;
+          }
+
+          .site-header.is-scrolled {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 24px rgba(23, 18, 15, 0.08);
+          }
+
+          .header-right-box {
+            gap: 0.5rem;
+          }
+        }
       `}</style>
 
       <header className={`site-header ${scrolled ? 'is-scrolled' : 'is-initial'}`} style={{ '--nav-color': foreground }}>
@@ -131,6 +147,8 @@ const Header = () => {
               src={LogoImg} 
               alt="Logo" 
               className={`transition-all duration-500 object-contain ${scrolled ? 'h-[35px]' : 'h-[42px]'}`}
+              width="176"
+              height="38"
               style={{ filter: isHomeTop ? 'brightness(0) invert(1)' : 'none' }}
             />
           </Link>
