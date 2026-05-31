@@ -13,3 +13,25 @@
 html {
   scroll-behavior: smooth;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden;
+  background: #ffffff;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+}
