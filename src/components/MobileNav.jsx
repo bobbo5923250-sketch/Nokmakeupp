@@ -82,6 +82,7 @@ const MobileNav = ({ color = '#1a1410' }) => {
               overflow: 'hidden',
               zIndex: 200,
               transformOrigin: 'top center',
+              maxHeight: 'calc(100svh - 92px)',
             }}
           >
             {links.map((link, index) => (

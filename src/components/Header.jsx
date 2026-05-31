@@ -64,6 +64,19 @@ const Header = () => {
           width: 100%;
           max-width: 1400px;
           margin: 0 auto;
+          min-width: 0;
+        }
+
+        .brand-link {
+          display: flex;
+          align-items: center;
+          min-width: 0;
+          flex: 0 1 auto;
+        }
+
+        .brand-logo {
+          width: min(176px, 48vw);
+          height: auto;
         }
 
         .desktop-nav {
@@ -134,6 +147,21 @@ const Header = () => {
 
           .header-right-box {
             gap: 0.5rem;
+            flex: 0 0 auto;
+          }
+
+          .brand-logo {
+            width: min(168px, 52vw);
+          }
+        }
+
+        @media (max-width: 360px) {
+          .site-header.is-initial, .site-header.is-scrolled {
+            padding: 0 0.7rem;
+          }
+
+          .brand-logo {
+            width: 145px;
           }
         }
       `}</style>
@@ -142,11 +170,11 @@ const Header = () => {
         <div className="header-inner">
           
           {/* 1. LOGO */}
-          <Link to="/" className="flex items-center">
+          <Link to="/" className="brand-link">
             <img 
               src={LogoImg} 
               alt="Logo" 
-              className={`transition-all duration-500 object-contain ${scrolled ? 'h-[35px]' : 'h-[42px]'}`}
+              className={`brand-logo transition-all duration-500 object-contain ${scrolled ? 'h-[35px]' : 'h-[42px]'}`}
               width="176"
               height="38"
               style={{ filter: isHomeTop ? 'brightness(0) invert(1)' : 'none' }}
