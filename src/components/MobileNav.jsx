@@ -1,129 +1,157 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { CgMenuRight } from 'react-icons/cg';
-import { useNavigate } from 'react-router-dom';
+import { CgClose, CgMenuRight } from 'react-icons/cg';
+import { FiArrowUpRight } from 'react-icons/fi';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
+import Socials from './Socials';
 
 const links = [
-  { name: 'Home',           path: '/' },
+  { name: 'Home', path: '/' },
   { name: 'Wedding Makeup', path: '/wedding' },
-  { name: 'Daily Makeup',   path: '/daily' },
-  { name: 'All Makeup',        path: '/all' },
+  { name: 'Daily Makeup', path: '/daily' },
+  { name: 'All Portfolio', path: '/all' },
 ];
 
-const MobileNav = ({ color = '#1a1410' }) => {
-  const [openMenu, setOpenMenu] = useState(false);
-  const navigate  = useNavigate();
-  const wrapRef   = useRef(null);
+const MobileNav = () => {
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const wrapRef = useRef(null);
 
-  // ปิดเมื่อคลิกนอก dropdown
   useEffect(() => {
-    const handler = (e) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
-        setOpenMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
+    document.body.style.overflow = open ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [open]);
 
-  const handleLinkClick = (e, path) => {
+  const go = (e, path) => {
     e.preventDefault();
-    setOpenMenu(false);
-    setTimeout(() => navigate(path), 250);
+    setOpen(false);
+    setTimeout(() => navigate(path), 240);
   };
 
   return (
-    // ไม่ต้องมี lg:hidden ที่นี่ — Header.jsx จัดการด้วย <div className="lg:hidden"> แล้ว
-    <div ref={wrapRef} style={{ position: 'relative' }}>
-
-      {/* Hamburger button */}
+    <div ref={wrapRef} style={{ position: 'relative', display: 'flex' }}>
       <Motion.button
-        whileTap={{ scale: 0.88 }}
-        onClick={() => setOpenMenu((v) => !v)}
+        whileTap={{ scale: 0.9 }}
+        onClick={() => setOpen((v) => !v)}
+        aria-label={open ? 'Close menu' : 'Open menu'}
         style={{
-          width: '42px',
-          height: '42px',
-          background: 'rgba(255,255,255,0.12)',
-          border: '1px solid rgba(184,154,106,0.22)',
+          width: '44px',
+          height: '44px',
+          background: 'rgba(33,28,24,0.05)',
+          border: '1px solid var(--line)',
           borderRadius: '999px',
           cursor: 'pointer',
-          fontSize: '1.45rem',
-          color,
-          padding: '0',
-          display: 'flex', alignItems: 'center',
+          fontSize: '1.4rem',
+          color: 'var(--ink)',
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'center',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
+          zIndex: 210,
+          position: 'relative',
         }}
       >
-        <CgMenuRight />
+        {open ? <CgClose /> : <CgMenuRight />}
       </Motion.button>
 
-      {/* Dropdown box */}
       <AnimatePresence>
-        {openMenu && (
-          <Motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0,  scale: 1 }}
-            exit={{   opacity: 0, y: -6,  scale: 0.96 }}
-            transition={{ ease: [0.4, 0, 0.2, 1], duration: 0.22 }}
-            style={{
-              position: 'fixed',
-              top: '76px',
-              left: '0.9rem',
-              right: '0.9rem',
-              minWidth: '0',
-              background: 'rgba(245,240,232,0.97)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid rgba(184,154,106,0.3)',
-              borderRadius: '16px',
-              boxShadow: '0 18px 46px rgba(26,20,16,0.16)',
-              overflow: 'hidden',
-              zIndex: 200,
-              transformOrigin: 'top center',
-              maxHeight: 'calc(100svh - 92px)',
-            }}
-          >
-            {links.map((link, index) => (
-              <Motion.div
-                key={index}
-                initial={{ opacity: 0, x: 8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05, duration: 0.2 }}
+        {open && (
+          <>
+            <Motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setOpen(false)}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(33,28,24,0.32)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)',
+                zIndex: 190,
+              }}
+            />
+
+            <Motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ ease: [0.22, 1, 0.36, 1], duration: 0.42 }}
+              style={{
+                position: 'fixed',
+                top: 0,
+                right: 0,
+                bottom: 0,
+                width: 'min(86vw, 360px)',
+                background: 'var(--ivory)',
+                borderLeft: '1px solid var(--line)',
+                boxShadow: '-30px 0 80px rgba(33,28,24,0.18)',
+                zIndex: 200,
+                display: 'flex',
+                flexDirection: 'column',
+                padding: '6.5rem 1.8rem 2rem',
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.7rem',
+                  fontWeight: 600,
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: 'var(--mocha)',
+                  marginBottom: '1.4rem',
+                }}
               >
+                Menu
+              </span>
+
+              <nav style={{ display: 'flex', flexDirection: 'column' }}>
+                {links.map((link, index) => {
+                  const active = location.pathname === link.path;
+                  return (
+                    <Motion.a
+                      key={link.path}
+                      href={link.path}
+                      onClick={(e) => go(e, link.path)}
+                      initial={{ opacity: 0, x: 24 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.12 + index * 0.06, duration: 0.3 }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '1rem 0',
+                        borderBottom: '1px solid var(--line-soft)',
+                        fontFamily: 'var(--font-serif)',
+                        fontSize: '1.55rem',
+                        fontWeight: 400,
+                        color: active ? 'var(--mocha-deep)' : 'var(--ink)',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      {link.name}
+                      <FiArrowUpRight style={{ fontSize: '1.1rem', color: 'var(--mocha)' }} />
+                    </Motion.a>
+                  );
+                })}
+              </nav>
+
+              <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>
                 <a
-                  href={link.path}
-                  onClick={(e) => handleLinkClick(e, link.path)}
-                  style={{
-                    display: 'block',
-                    padding: '1rem 1.1rem',
-                    fontFamily: "'Noto Sans Thai', sans-serif",
-                    fontSize: '0.92rem',
-                    fontWeight: 600,
-                    letterSpacing: '0.04em',
-                    textTransform: 'uppercase',
-                    color: '#1a1410',
-                    textDecoration: 'none',
-                    borderBottom: index < links.length - 1
-                      ? '1px solid rgba(184,154,106,0.12)'
-                      : 'none',
-                    transition: 'background 0.2s, color 0.2s',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.background = 'rgba(184,154,106,0.08)';
-                    e.currentTarget.style.color = '#b89a6a';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = '#1a1410';
-                  }}
+                  href="https://lin.ee/aZQJ4JQ"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="u-btn u-btn--primary"
+                  style={{ width: '100%', marginBottom: '1.6rem' }}
                 >
-                  {link.name}
+                  จองคิวผ่าน LINE
                 </a>
-              </Motion.div>
-            ))}
-          </Motion.div>
+                <Socials gap="1.4rem" size="1.2rem" />
+              </div>
+            </Motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>

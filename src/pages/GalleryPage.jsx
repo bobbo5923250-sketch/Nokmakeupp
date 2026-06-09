@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { FiArrowRight, FiChevronLeft, FiChevronRight, FiMessageCircle, FiX } from 'react-icons/fi';
+import { FiArrowRight, FiChevronLeft, FiChevronRight, FiX, FiZoomIn } from 'react-icons/fi';
+import Footer from '../components/Footer';
 
 const PAGE_SIZE = 12;
 const TILE_RATIOS = ['4 / 5', '3 / 4', '1 / 1', '5 / 7', '4 / 6'];
@@ -62,7 +63,7 @@ function MasonryTile({ src, title, globalIndex, onClick }) {
             style={{ opacity: loaded ? 1 : 0 }}
           />
           <span className="tile-index">{String(globalIndex + 1).padStart(2, '0')}</span>
-          <span className="tile-zoom">ดูภาพ</span>
+          <span className="tile-zoom"><FiZoomIn /> ดูภาพ</span>
         </>
       )}
     </button>
@@ -161,110 +162,64 @@ const GalleryPage = ({ modules, eyebrow, title, accent, copy }) => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Noto+Serif+Thai:wght@300;400;500;600&display=swap');
-
-        :root {
-          --cream: #f7f1ea;
-          --ink: #17120f;
-          --soft-ink: #5b5048;
-          --gold: #b59664;
-          --rose: #b97872;
-        }
-
         .gallery-page {
           min-height: 100vh;
-          padding: 128px clamp(1rem, 4vw, 3rem) 4rem;
+          padding: clamp(7rem, 13vw, 10rem) clamp(1rem, 4vw, 3.5rem) 4rem;
           background:
-            linear-gradient(180deg, #fbf8f4 0%, var(--cream) 44%, #ffffff 100%);
+            radial-gradient(120% 60% at 80% 0%, rgba(216, 180, 166, 0.16) 0%, transparent 55%),
+            var(--ivory);
           color: var(--ink);
-          font-family: 'Noto Sans Thai', sans-serif;
+          font-family: var(--font-sans);
         }
 
         .gallery-hero {
           max-width: 1240px;
-          margin: 0 auto 2.4rem;
+          margin: 0 auto 3rem;
           display: grid;
           grid-template-columns: minmax(0, 1fr) minmax(260px, 430px);
           gap: clamp(1.5rem, 5vw, 4rem);
           align-items: end;
           opacity: 0;
-          transform: translate3d(0, 16px, 0);
-          transition: opacity 0.8s ease, transform 0.8s ease;
+          transform: translate3d(0, 18px, 0);
+          transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
         }
-
-        .loaded .gallery-hero {
-          opacity: 1;
-          transform: translate3d(0, 0, 0);
-        }
-
-        .gallery-eyebrow {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.75rem;
-          color: var(--rose);
-          font-size: 0.72rem;
-          font-weight: 600;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          margin-bottom: 0.9rem;
-        }
-
-        .gallery-eyebrow::before {
-          content: '';
-          width: 42px;
-          height: 1px;
-          background: var(--rose);
-        }
+        .loaded .gallery-hero { opacity: 1; transform: translate3d(0, 0, 0); }
 
         .gallery-title {
-          font-family: 'Noto Serif Thai', serif;
-          font-size: clamp(2.55rem, 6.3vw, 5.9rem);
+          font-family: var(--font-serif);
           font-weight: 400;
-          line-height: 1.08;
-          margin: 0;
+          font-size: clamp(2.6rem, 6.5vw, 6rem);
+          line-height: 1.05;
+          letter-spacing: -0.01em;
+          margin: 1rem 0 0;
         }
-
-        .gallery-title em {
-          color: var(--gold);
-          font-style: italic;
-        }
+        .gallery-title em { color: var(--mocha); font-style: italic; }
 
         .gallery-copy {
-          color: var(--soft-ink);
-          line-height: 1.8;
-          margin: 0 0 1.4rem;
+          color: var(--soft);
+          line-height: 1.85;
+          margin: 0 0 1.5rem;
         }
 
-        .gallery-meta {
-          display: flex;
-          gap: 0.65rem;
-          flex-wrap: wrap;
-        }
-
+        .gallery-meta { display: flex; gap: 0.6rem; flex-wrap: wrap; }
         .gallery-pill {
-          border: 1px solid rgba(181, 150, 100, 0.35);
+          border: 1px solid var(--line);
           border-radius: 999px;
-          padding: 0.55rem 0.85rem;
-          color: var(--soft-ink);
-          font-size: 0.72rem;
+          padding: 0.55rem 1rem;
+          color: var(--soft);
+          font-size: 0.74rem;
           font-weight: 500;
+          background: rgba(255, 255, 255, 0.5);
         }
 
         .masonry {
           display: flex;
-          gap: 14px;
+          gap: 16px;
           align-items: flex-start;
           max-width: 1240px;
           margin: 0 auto;
         }
-
-        .masonry-col {
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
-          flex: 1;
-          min-width: 0;
-        }
+        .masonry-col { display: flex; flex-direction: column; gap: 16px; flex: 1; min-width: 0; }
 
         .masonry-tile {
           width: 100%;
@@ -274,384 +229,200 @@ const GalleryPage = ({ modules, eyebrow, title, accent, copy }) => {
           position: relative;
           padding: 0;
           border: 0;
-          border-radius: 8px;
-          background: #e7dcd0;
+          border-radius: 16px;
+          background: var(--sand);
           cursor: pointer;
-          transition: opacity 0.7s ease, transform 0.7s ease, box-shadow 0.28s ease;
+          transition: opacity 0.7s var(--ease), transform 0.7s var(--ease), box-shadow 0.32s var(--ease);
           text-align: left;
           content-visibility: auto;
           contain-intrinsic-size: 360px 480px;
         }
-
-        .masonry-tile::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(110deg, #dfd2c5 8%, #f4eadf 18%, #dfd2c5 33%);
-          background-size: 200% 100%;
-          animation: gallerySheen 1.1s linear infinite;
-        }
-
-        @keyframes gallerySheen {
-          to { background-position-x: -200%; }
-        }
-
-        .masonry-tile:hover {
-          box-shadow: 0 18px 40px rgba(23, 18, 15, 0.16);
-        }
+        .masonry-tile:hover { box-shadow: var(--shadow-md); }
 
         .masonry-tile img {
-          width: 100%;
-          height: 100%;
+          width: 100%; height: 100%;
           display: block;
           object-fit: cover;
           transform: scale(1);
-          transition: opacity 0.55s ease, transform 0.55s ease;
-          position: absolute;
-          inset: 0;
-          z-index: 1;
+          transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+          position: absolute; inset: 0; z-index: 1;
         }
-
-        .masonry-tile:hover img {
-          transform: scale(1.035);
-        }
+        .masonry-tile:hover img { transform: scale(1.05); }
 
         .masonry-tile::after {
           content: '';
-          position: absolute;
-          inset: 0;
-          background: rgba(23, 18, 15, 0);
-          transition: background 0.28s ease;
+          position: absolute; inset: 0;
+          background: linear-gradient(to top, rgba(33,28,24,0.42), rgba(33,28,24,0) 45%);
+          opacity: 0;
+          transition: opacity 0.32s var(--ease);
           z-index: 1;
         }
-
-        .masonry-tile:hover::after {
-          background: rgba(23, 18, 15, 0.18);
-        }
+        .masonry-tile:hover::after { opacity: 1; }
 
         .tile-index {
           position: absolute;
-          top: 0.75rem;
-          left: 0.75rem;
+          top: 0.85rem; left: 0.85rem;
           z-index: 2;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          min-width: 34px;
-          height: 28px;
+          min-width: 34px; height: 28px;
+          padding: 0 0.5rem;
           border-radius: 999px;
-          background: rgba(23,18,15,0.48);
-          color: rgba(255,255,255,0.84);
-          font-family: 'Noto Serif Thai', serif;
-          font-size: 1rem;
+          background: rgba(250, 247, 242, 0.9);
+          color: var(--ink);
+          font-family: var(--font-serif);
+          font-size: 0.9rem;
           opacity: 0;
-          transition: opacity 0.25s ease, transform 0.25s ease;
+          transform: translateY(-4px);
+          transition: opacity 0.28s var(--ease), transform 0.28s var(--ease);
         }
-
-        .masonry-tile:hover .tile-index {
-          opacity: 1;
-          transform: translateY(-2px);
-        }
+        .masonry-tile:hover .tile-index { opacity: 1; transform: translateY(0); }
 
         .tile-zoom {
           position: absolute;
-          left: 50%;
-          top: 50%;
+          left: 50%; top: 50%;
           z-index: 2;
-          transform: translate(-50%, -50%);
+          transform: translate(-50%, -46%);
           opacity: 0;
-          color: white;
-          border: 1px solid rgba(255,255,255,0.62);
-          border-radius: 4px;
-          padding: 0.5rem 0.85rem;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          color: var(--ink);
+          background: rgba(250, 247, 242, 0.94);
+          border-radius: 999px;
+          padding: 0.55rem 1.1rem;
           font-size: 0.74rem;
           font-weight: 600;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.04em;
           text-transform: uppercase;
-          transition: opacity 0.28s ease;
+          transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
         }
-
-        .masonry-tile:hover .tile-zoom {
-          opacity: 1;
-        }
+        .masonry-tile:hover .tile-zoom { opacity: 1; transform: translate(-50%, -50%); }
 
         .gallery-footer {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 0.75rem;
-          padding: 3rem 0 1rem;
+          gap: 0.8rem;
+          padding: 3.5rem 0 1rem;
         }
-
-        .progress-track {
-          width: 170px;
-          height: 2px;
-          background: rgba(181,150,100,0.2);
-        }
-
-        .progress-fill {
-          height: 100%;
-          background: var(--gold);
-          transition: width 0.6s ease;
-        }
-
+        .progress-track { width: 180px; height: 3px; border-radius: 999px; background: var(--line); overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--mocha); transition: width 0.6s var(--ease); }
         .progress-label {
           font-size: 0.74rem;
           font-weight: 500;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.06em;
           text-transform: uppercase;
-          color: var(--soft-ink);
+          color: var(--soft);
         }
 
         .gallery-cta {
-          max-width: 1000px;
-          margin: 3rem auto 0;
-          padding: clamp(1.4rem, 4vw, 2.4rem);
+          max-width: 1100px;
+          margin: 3.5rem auto 0;
+          padding: clamp(2rem, 5vw, 3.5rem);
           display: flex;
           justify-content: space-between;
-          gap: 1.5rem;
+          gap: 2rem;
           align-items: center;
-          border-radius: 8px;
-          background: #17120f;
-          color: white;
+          border-radius: 26px;
+          background: linear-gradient(135deg, #b58a72 0%, var(--mocha-deep) 100%);
+          color: var(--ivory);
+          box-shadow: var(--shadow-lg);
         }
-
         .gallery-cta h2 {
-          font-family: 'Noto Serif Thai', serif;
-          font-size: clamp(1.9rem, 3.6vw, 3.1rem);
+          font-family: var(--font-serif);
           font-weight: 400;
+          font-size: clamp(1.9rem, 3.6vw, 3rem);
           line-height: 1.16;
           margin: 0 0 0.6rem;
+          max-width: 18ch;
         }
+        .gallery-cta p { margin: 0; color: rgba(255, 255, 255, 0.84); line-height: 1.75; max-width: 42ch; }
 
-        .gallery-cta p {
-          margin: 0;
-          color: rgba(255,255,255,0.72);
-          line-height: 1.7;
-        }
-
-        .line-btn {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.55rem;
-          min-height: 46px;
-          padding: 0 1.1rem;
-          border-radius: 6px;
-          background: #f1d09a;
-          color: #17120f;
-          text-decoration: none;
-          font-size: 0.78rem;
-          font-weight: 600;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-          white-space: nowrap;
-          transition: transform 0.24s ease;
-        }
-
-        .line-btn:hover {
-          transform: translateY(-2px);
-        }
-
+        /* ---------- LIGHTBOX ---------- */
         .lightbox-overlay {
-          position: fixed;
-          inset: 0;
-          z-index: 200;
+          position: fixed; inset: 0;
+          z-index: 300;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: rgba(15, 12, 10, 0.95);
-          animation: lbFadeIn 0.25s ease;
+          background: rgba(20, 16, 13, 0.94);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+          animation: lbFadeIn 0.28s var(--ease);
         }
-
-        @keyframes lbFadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
+        @keyframes lbFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .lightbox-img {
           max-width: 86vw;
-          max-height: 86vh;
+          max-height: 84vh;
           object-fit: contain;
-          box-shadow: 0 26px 80px rgba(0,0,0,0.36);
+          border-radius: 6px;
+          box-shadow: 0 30px 90px rgba(0,0,0,0.45);
+          animation: lbZoom 0.32s var(--ease);
         }
-
-        .lightbox-panel {
-          position: absolute;
-          left: 1.5rem;
-          bottom: 1.5rem;
-          z-index: 2;
-          width: min(360px, calc(100vw - 3rem));
-          padding: 1rem;
-          border: 1px solid rgba(255,255,255,0.18);
-          border-radius: 8px;
-          background: rgba(23,18,15,0.64);
-          color: white;
-          backdrop-filter: blur(14px);
-        }
-
-        .lightbox-panel span {
-          display: block;
-          color: #f1d09a;
-          font-size: 0.72rem;
-          font-weight: 600;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          margin-bottom: 0.55rem;
-        }
-
-        .lightbox-panel h2 {
-          font-family: 'Noto Serif Thai', serif;
-          font-size: 1.9rem;
-          font-weight: 400;
-          line-height: 1.16;
-          margin: 0 0 0.55rem;
-        }
-
-        .lightbox-panel p {
-          color: rgba(255,255,255,0.72);
-          font-size: 0.84rem;
-          line-height: 1.65;
-          margin: 0 0 0.9rem;
-        }
+        @keyframes lbZoom { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
 
         .lightbox-btn {
           position: absolute;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          width: 44px;
-          height: 44px;
-          border: 1px solid rgba(255,255,255,0.24);
+          width: 48px; height: 48px;
+          border: 1px solid rgba(250, 247, 242, 0.24);
           border-radius: 50%;
-          background: rgba(255,255,255,0.06);
-          color: rgba(255,255,255,0.82);
+          background: rgba(250, 247, 242, 0.06);
+          color: rgba(250, 247, 242, 0.85);
           cursor: pointer;
-          transition: color 0.2s ease, border-color 0.2s ease;
+          font-size: 1.15rem;
+          transition: color 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
         }
-
         .lightbox-btn:hover {
-          color: #f1d09a;
-          border-color: rgba(241,208,154,0.5);
+          color: var(--ink);
+          background: var(--ivory);
+          border-color: var(--ivory);
         }
-
         .lightbox-close { top: 1.5rem; right: 1.5rem; }
         .lightbox-prev { left: 1.5rem; top: 50%; transform: translateY(-50%); }
         .lightbox-next { right: 1.5rem; top: 50%; transform: translateY(-50%); }
 
         .lightbox-counter {
           position: absolute;
-          bottom: 1.5rem;
-          left: 50%;
+          bottom: 1.5rem; left: 50%;
           transform: translateX(-50%);
-          color: rgba(255,255,255,0.55);
-          font-size: 0.82rem;
-          letter-spacing: 0.04em;
+          color: rgba(250, 247, 242, 0.6);
+          font-size: 0.84rem;
+          letter-spacing: 0.06em;
         }
 
         @media (max-width: 860px) {
-          .gallery-page {
-            padding: 92px 0.8rem 3rem;
-          }
-          .gallery-hero {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-bottom: 1.3rem;
-          }
-
-          .gallery-title {
-            font-size: clamp(2.25rem, 11vw, 3.2rem);
-          }
-
-          .gallery-copy {
-            font-size: 0.94rem;
-            line-height: 1.7;
-            margin-bottom: 1rem;
-          }
-
-          .gallery-meta {
-            gap: 0.45rem;
-          }
-
-          .gallery-pill {
-            font-size: 0.68rem;
-            padding: 0.45rem 0.65rem;
-          }
-
-          .masonry { gap: 8px; }
-          .masonry-col { gap: 8px; }
-          .gallery-cta {
-            align-items: flex-start;
-            flex-direction: column;
-            margin-top: 2rem;
-            border-radius: 10px;
-          }
+          .gallery-hero { grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+          .gallery-title { font-size: clamp(2.4rem, 12vw, 3.4rem); }
+          .gallery-copy { font-size: 0.95rem; margin-bottom: 1.1rem; }
+          .masonry { gap: 10px; }
+          .masonry-col { gap: 10px; }
+          .gallery-cta { flex-direction: column; align-items: flex-start; border-radius: 20px; }
         }
 
         @media (max-width: 560px) {
-          .masonry {
-            gap: 6px;
-          }
-
-          .masonry-tile {
-            border-radius: 7px;
-          }
-
-          .masonry-col { gap: 6px; }
-
-          .gallery-footer {
-            padding: 2rem 0 0.5rem;
-          }
-
-          .line-btn { width: 100%; }
-
-          .lightbox-overlay {
-            align-items: flex-start;
-            padding: 4.4rem 0.75rem 0;
-          }
-
-          .lightbox-img {
-            max-width: 100%;
-            max-height: 56vh;
-            margin-top: 0.25rem;
-          }
-
-          .lightbox-panel {
-            left: 0.75rem;
-            right: 0.75rem;
-            bottom: 0.75rem;
-            width: auto;
-            padding: 0.9rem;
-          }
-
-          .lightbox-panel h2 {
-            font-size: 1.55rem;
-          }
-
-          .lightbox-panel p {
-            font-size: 0.8rem;
-          }
-
-          .lightbox-counter { bottom: 1rem; }
-          .lightbox-prev {
-            left: 0.75rem;
-            top: 38vh;
-          }
-          .lightbox-next {
-            right: 0.75rem;
-            top: 38vh;
-          }
-          .lightbox-close {
-            top: 0.9rem;
-            right: 0.9rem;
-          }
+          .masonry { gap: 8px; }
+          .masonry-col { gap: 8px; }
+          .masonry-tile { border-radius: 12px; }
+          .gallery-cta .u-btn { width: 100%; }
+          .lightbox-overlay { align-items: flex-start; padding: 4.4rem 0.75rem 0; }
+          .lightbox-img { max-width: 100%; max-height: 64vh; margin-top: 0.5rem; }
+          .lightbox-prev { left: 0.75rem; top: auto; bottom: 4.5rem; transform: none; }
+          .lightbox-next { right: 0.75rem; top: auto; bottom: 4.5rem; transform: none; }
+          .lightbox-close { top: 0.9rem; right: 0.9rem; }
+          .lightbox-counter { bottom: 1.2rem; }
         }
       `}</style>
 
       <section className="gallery-page" ref={sectionRef}>
         <header className="gallery-hero">
           <div>
-            <span className="gallery-eyebrow">{eyebrow}</span>
+            <span className="u-eyebrow">{eyebrow}</span>
             <h1 className="gallery-title">{title} <em>{accent}</em></h1>
           </div>
           <div>
@@ -693,7 +464,7 @@ const GalleryPage = ({ modules, eyebrow, title, accent, copy }) => {
             <h2>ชอบลุคไหน ส่งรูปให้ช่วยประเมินได้เลย</h2>
             <p>แจ้งวันงาน สถานที่ และจำนวนคนผ่าน LINE เพื่อเช็กคิวและราคาได้รวดเร็วขึ้น</p>
           </div>
-          <a href="https://lin.ee/aZQJ4JQ" target="_blank" rel="noreferrer" className="line-btn">
+          <a href="https://lin.ee/aZQJ4JQ" target="_blank" rel="noreferrer" className="u-btn u-btn--light">
             สอบถามคิวว่าง <FiArrowRight />
           </a>
         </aside>
@@ -711,18 +482,12 @@ const GalleryPage = ({ modules, eyebrow, title, accent, copy }) => {
             <button className="lightbox-btn lightbox-close" type="button" aria-label="Close" onClick={() => setLightbox(null)}><FiX /></button>
             <button className="lightbox-btn lightbox-prev" type="button" aria-label="Previous" onClick={(event) => { event.stopPropagation(); setLightbox((lightbox - 1 + images.length) % images.length); }}><FiChevronLeft /></button>
             <button className="lightbox-btn lightbox-next" type="button" aria-label="Next" onClick={(event) => { event.stopPropagation(); setLightbox((lightbox + 1) % images.length); }}><FiChevronRight /></button>
-            <div className="lightbox-panel" onClick={(event) => event.stopPropagation()}>
-              <span>Reference #{String(lightbox + 1).padStart(2, '0')}</span>
-              <h2>ใช้ลุคนี้เป็น reference</h2>
-              <p>ถ้าชอบภาพนี้ ส่งให้ช่างพร้อมวันงานได้เลย จะช่วยประเมินโทนและรายละเอียดได้แม่นขึ้น</p>
-              <a href="https://lin.ee/aZQJ4JQ" target="_blank" rel="noreferrer" className="line-btn">
-                ส่งรูปนี้ทาง LINE <FiMessageCircle />
-              </a>
-            </div>
             <span className="lightbox-counter">{lightbox + 1} / {images.length}</span>
           </div>
         )}
       </section>
+
+      <Footer />
     </>
   );
 };

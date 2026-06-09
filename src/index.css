@@ -1,21 +1,55 @@
 @import "tailwindcss";
 
+/* ===========================================================
+   Nokmakeupp — Design System
+   Modern Editorial Luxury · warm, light, approachable
+   =========================================================== */
+
 @theme {
-  --color-luxury-gold: #b89a6a;
-  --color-luxury-cream: #f9f6f2;
-  --color-luxury-ink: #1a1410;
-  
+  /* Surfaces */
+  --color-ivory: #faf7f2;
+  --color-cream: #f1ebe1;
+  --color-sand: #e9e0d4;
+
+  /* Ink & text */
+  --color-ink: #211c18;
+  --color-soft: #6e6258;
+
+  /* Accents */
+  --color-mocha: #a47864;
+  --color-mocha-deep: #7c5749;
+  --color-blush: #d8b4a6;
+  --color-gold: #c2a878;
+
   --font-serif: "Noto Serif Thai", serif;
   --font-sans: "Noto Sans Thai", sans-serif;
 }
 
-/* เพิ่ม Smooth Scroll ให้เว็บดูแพงขึ้น */
-html {
-  scroll-behavior: smooth;
+/* Design tokens exposed as plain CSS vars for component styles */
+:root {
+  --ivory: #faf7f2;
+  --cream: #f1ebe1;
+  --sand: #e9e0d4;
+  --ink: #211c18;
+  --soft: #6e6258;
+  --mocha: #a47864;
+  --mocha-deep: #7c5749;
+  --blush: #d8b4a6;
+  --gold: #c2a878;
+  --line: rgba(33, 28, 24, 0.12);
+  --line-soft: rgba(33, 28, 24, 0.07);
+  --shadow-sm: 0 6px 20px rgba(33, 28, 24, 0.06);
+  --shadow-md: 0 18px 50px rgba(33, 28, 24, 0.12);
+  --shadow-lg: 0 30px 80px rgba(33, 28, 24, 0.16);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 html,
@@ -27,11 +61,143 @@ body,
 
 body {
   overflow-x: hidden;
-  background: #ffffff;
+  background: var(--ivory);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 img,
 svg,
 video {
   max-width: 100%;
+}
+
+::selection {
+  background: var(--mocha);
+  color: #fff;
+}
+
+/* Refined scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+::-webkit-scrollbar-thumb {
+  background: #cdbfae;
+  border-radius: 999px;
+  border: 2px solid var(--cream);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mocha);
+}
+
+/* ---------- Shared primitives ---------- */
+
+.u-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mocha);
+}
+
+.u-eyebrow::before {
+  content: "";
+  width: 34px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.u-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 50px;
+  padding: 0 1.5rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.3s var(--ease), background 0.3s var(--ease),
+    color 0.3s var(--ease), border-color 0.3s var(--ease),
+    box-shadow 0.3s var(--ease);
+}
+
+.u-btn--primary {
+  background: var(--ink);
+  color: var(--ivory);
+}
+.u-btn--primary:hover {
+  background: var(--mocha-deep);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.u-btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+.u-btn--ghost:hover {
+  border-color: var(--mocha);
+  color: var(--mocha-deep);
+  transform: translateY(-2px);
+}
+
+.u-btn--light {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+}
+.u-btn--light:hover {
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.u-btn--outline-light {
+  background: transparent;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+.u-btn--outline-light:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.85);
+  transform: translateY(-2px);
+}
+
+/* Reveal-on-scroll */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 30px, 0);
+  transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+  will-change: opacity, transform;
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }

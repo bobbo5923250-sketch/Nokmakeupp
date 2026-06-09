@@ -1,16 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiArrowRight, FiCalendar, FiCheckCircle, FiHeart, FiMessageCircle } from 'react-icons/fi';
-import WomanImg1 from '../img/home/woman1.jpg';
+import {
+  FiArrowRight,
+  FiArrowUpRight,
+  FiCalendar,
+  FiCheck,
+  FiMessageCircle,
+  FiStar,
+} from 'react-icons/fi';
+import Footer from '../components/Footer';
+import HeroImg from '../img/home/woman1.jpg';
 import WomanImg2 from '../img/home/1.JPG';
 import WomanImg3 from '../img/home/2.JPG';
 import WomanImg4 from '../img/home/3.JPG';
+
+const stats = [
+  { value: '8+', label: 'ปีประสบการณ์' },
+  { value: '500+', label: 'ลูกค้าที่ไว้ใจ' },
+  { value: '4.9', label: 'คะแนนรีวิว' },
+];
 
 const services = [
   {
     title: 'Bridal Makeup',
     eyebrow: 'Wedding day',
-    copy: 'ลุคเจ้าสาวที่ติดทน ถ่ายรูปสวย และยังเป็นตัวคุณในทุกมุมกล้อง',
+    copy: 'ลุคเจ้าสาวที่ติดทนทั้งวัน ถ่ายรูปสวย และยังเป็นตัวคุณในทุกมุมกล้อง',
     image: WomanImg2,
     to: '/wedding',
   },
@@ -22,18 +36,12 @@ const services = [
     to: '/daily',
   },
   {
-    title: 'Portfolio',
+    title: 'Full Portfolio',
     eyebrow: 'Selected works',
-    copy: 'รวมผลงานจริงเพื่อให้เห็นสไตล์ผิว งานตา และโทนสีที่เลือกได้ตามโอกาส',
+    copy: 'รวมผลงานจริงให้เห็นสไตล์งานผิว งานตา และโทนสีที่เลือกได้ตามโอกาส',
     image: WomanImg4,
     to: '/all',
   },
-];
-
-const proofPoints = [
-  'ประเมินลุคให้เข้ากับชุด โทนผิว และสถานที่',
-  'งานผิวละเอียด ดูแพง ไม่หนักหน้า',
-  'จองคิวและปรึกษาลุคผ่าน LINE ได้ทันที',
 ];
 
 const lookMoods = [
@@ -60,972 +68,756 @@ const lookMoods = [
   },
 ];
 
-function warmImage(src, priority = 'low') {
+const steps = [
+  {
+    no: '01',
+    title: 'ทักมาปรึกษาลุค',
+    copy: 'ส่งวันงาน สถานที่ และรูปลุคที่ชอบทาง LINE เพื่อให้ช่วยแนะนำสไตล์ที่ใช่',
+  },
+  {
+    no: '02',
+    title: 'จองคิว & เช็กราคา',
+    copy: 'ยืนยันคิวด้วยมัดจำ พร้อมสรุปรายละเอียดและราคาที่ชัดเจนตั้งแต่ต้น',
+  },
+  {
+    no: '03',
+    title: 'วันงานสวยมั่นใจ',
+    copy: 'ถึงวันจริงเตรียมงานผิวให้ละเอียด ติดทน และดูแพงในทุกช็อต',
+  },
+];
+
+const proofPoints = [
+  'ประเมินลุคให้เข้ากับชุด โทนผิว และสถานที่จัดงาน',
+  'งานผิวละเอียด ดูแพง ติดทน ไม่หนักหน้า',
+  'ใช้แบรนด์เครื่องสำอางคุณภาพ ปลอดภัยกับผิว',
+  'จองคิวและปรึกษาลุคผ่าน LINE ได้สะดวกทุกขั้นตอน',
+];
+
+function warmImage(src) {
   const img = new Image();
   img.decoding = 'async';
-  img.fetchPriority = priority;
   img.src = src;
   return img.decode?.().catch(() => undefined);
 }
 
 const Home = () => {
-  const heroRef = useRef(null);
+  const pageRef = useRef(null);
   const [heroLoaded, setHeroLoaded] = useState(false);
   const [activeLook, setActiveLook] = useState(0);
 
   useEffect(() => {
-    const root = heroRef.current;
-    if (!root) return;
-    requestAnimationFrame(() => root.classList.add('loaded'));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
+    );
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) entry.target.classList.add('reveal');
-      });
-    }, { threshold: 0.14 });
-
-    document.querySelectorAll('.scroll-reveal').forEach((el) => observer.observe(el));
+    const root = pageRef.current;
+    if (root) root.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
-    const preload = document.createElement('link');
-    preload.rel = 'preload';
-    preload.as = 'image';
-    preload.href = WomanImg1;
-    preload.fetchPriority = 'high';
-    document.head.appendChild(preload);
-
-    const warmTimer = window.setTimeout(() => {
+    const timer = window.setTimeout(() => {
       [WomanImg2, WomanImg3, WomanImg4].forEach((src) => warmImage(src));
-    }, 450);
-
-    return () => {
-      document.head.removeChild(preload);
-      window.clearTimeout(warmTimer);
-    };
+    }, 500);
+    return () => window.clearTimeout(timer);
   }, []);
+
+  const look = lookMoods[activeLook];
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Noto+Serif+Thai:wght@300;400;500;600&display=swap');
-
-        :root {
-          --white: #ffffff;
-          --ink: #17120f;
-          --soft-ink: #544941;
-          --gold: #b59664;
-          --rose: #b97872;
-          --cream: #f7f1ea;
-          --line: rgba(23, 18, 15, 0.12);
-        }
-
-        .home-page {
-          background: var(--white);
+        .home {
+          font-family: var(--font-sans);
           color: var(--ink);
-          font-family: 'Noto Sans Thai', sans-serif;
+          background: var(--ivory);
         }
 
-        .hero-fullscreen {
+        .serif { font-family: var(--font-serif); }
+
+        /* ---------- HERO ---------- */
+        .hero {
           position: relative;
-          min-height: 100svh;
-          width: 100%;
+          padding: clamp(7rem, 14vw, 11rem) clamp(1.25rem, 5vw, 5rem) clamp(3rem, 6vw, 5rem);
+          max-width: 1320px;
+          margin: 0 auto;
           display: grid;
-          align-items: end;
-          justify-items: end;
-          overflow: hidden;
-          color: var(--white);
-          background: #17120f;
-          padding: 120px clamp(1.25rem, 5vw, 5rem) 42px;
-        }
-
-        .hero-bg-wrapper,
-        .hero-overlay {
-          position: absolute;
-          inset: 0;
-        }
-
-        .hero-bg-image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          object-position: center 20%;
-          transform: scale(1.04);
-          transition: opacity 0.8s ease, transform 2.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .loaded .hero-bg-image { transform: scale(1); }
-
-        .hero-overlay {
-          background:
-            linear-gradient(270deg, rgba(10,8,7,0.76) 0%, rgba(10,8,7,0.42) 45%, rgba(10,8,7,0.10) 100%),
-            linear-gradient(0deg, rgba(10,8,7,0.66) 0%, rgba(10,8,7,0.04) 56%);
-          z-index: 1;
-        }
-
-        .hero-content {
-          position: relative;
-          z-index: 2;
-          max-width: 760px;
-          margin-left: auto;
-          text-align: right;
-          opacity: 0;
-          transform: translate3d(0, 28px, 0);
-          transition: opacity 1.1s ease 0.3s, transform 1.1s ease 0.3s;
-        }
-
-        .loaded .hero-content { opacity: 1; transform: translate3d(0, 0, 0); }
-
-        .hero-kicker,
-        .section-kicker,
-        .service-eyebrow {
-          font-size: 0.72rem;
-          font-weight: 600;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }
-
-        .hero-kicker {
-          display: inline-flex;
+          grid-template-columns: 1.05fr 0.95fr;
+          gap: clamp(2rem, 5vw, 5rem);
           align-items: center;
-          justify-content: flex-end;
-          gap: 0.7rem;
-          color: rgba(255,255,255,0.84);
-          margin-bottom: 1.2rem;
         }
 
-        .hero-kicker::before {
-          content: '';
-          width: 42px;
-          height: 1px;
-          background: var(--gold);
-        }
+        .hero-eyebrow { margin-bottom: 1.6rem; }
 
         .hero-title {
-          font-family: 'Noto Serif Thai', serif;
-          font-size: clamp(3rem, 8vw, 7rem);
+          font-family: var(--font-serif);
           font-weight: 400;
-          line-height: 1.02;
-          margin: 0 0 1.3rem;
-          max-width: 720px;
+          font-size: clamp(2.8rem, 6vw, 5.4rem);
+          line-height: 1.05;
+          letter-spacing: -0.01em;
+          margin: 0 0 1.6rem;
         }
-
-        .hero-title em { color: #e4c28a; font-style: italic; }
+        .hero-title em {
+          font-style: italic;
+          color: var(--mocha);
+        }
 
         .hero-copy {
-          max-width: 560px;
-          margin-left: auto;
-          color: rgba(255,255,255,0.82);
-          font-size: clamp(1rem, 1.55vw, 1.14rem);
-          line-height: 1.9;
-          margin: 0 0 1.8rem;
+          max-width: 460px;
+          color: var(--soft);
+          font-size: clamp(1rem, 1.4vw, 1.12rem);
+          line-height: 1.85;
+          margin: 0 0 2.2rem;
         }
 
-        .hero-actions,
-        .section-actions {
+        .hero-actions {
           display: flex;
           flex-wrap: wrap;
           gap: 0.8rem;
-          align-items: center;
-          justify-content: flex-end;
+          margin-bottom: 2.8rem;
         }
 
-        .primary-btn,
-        .ghost-btn,
-        .text-link {
+        .hero-stats {
+          display: flex;
+          gap: clamp(1.5rem, 4vw, 3rem);
+        }
+        .hero-stat-value {
+          font-family: var(--font-serif);
+          font-size: clamp(1.7rem, 3vw, 2.4rem);
+          line-height: 1;
+          color: var(--ink);
+        }
+        .hero-stat-label {
+          display: block;
+          margin-top: 0.4rem;
+          font-size: 0.78rem;
+          color: var(--soft);
+          letter-spacing: 0.02em;
+        }
+        .hero-stat + .hero-stat {
+          padding-left: clamp(1.5rem, 4vw, 3rem);
+          border-left: 1px solid var(--line);
+        }
+
+        /* hero image */
+        .hero-visual {
+          position: relative;
+        }
+        .hero-frame {
+          position: relative;
+          aspect-ratio: 4 / 5;
+          border-radius: 220px 220px 18px 18px;
+          overflow: hidden;
+          background: var(--sand);
+          box-shadow: var(--shadow-lg);
+        }
+        .hero-frame img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center 18%;
+          transform: scale(1.05);
+          transition: opacity 0.9s var(--ease), transform 2.2s var(--ease);
+          opacity: 0;
+        }
+        .hero-frame img.loaded { opacity: 1; transform: scale(1); }
+
+        .hero-badge {
+          position: absolute;
+          left: -1.2rem;
+          bottom: 2.2rem;
+          display: flex;
+          align-items: center;
+          gap: 0.7rem;
+          padding: 0.85rem 1.2rem;
+          background: rgba(250, 247, 242, 0.9);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid var(--line-soft);
+          border-radius: 16px;
+          box-shadow: var(--shadow-md);
+        }
+        .hero-badge-dot {
+          width: 9px; height: 9px;
+          border-radius: 50%;
+          background: #4caf72;
+          box-shadow: 0 0 0 4px rgba(76, 175, 114, 0.18);
+        }
+        .hero-badge strong {
+          display: block;
+          font-family: var(--font-sans);
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: var(--ink);
+        }
+        .hero-badge span {
+          font-size: 0.72rem;
+          color: var(--soft);
+        }
+
+        .hero-tag {
+          position: absolute;
+          right: -0.6rem;
+          top: 2rem;
           display: inline-flex;
           align-items: center;
-          justify-content: center;
-          gap: 0.55rem;
-          min-height: 46px;
-          padding: 0 1.2rem;
-          border-radius: 6px;
-          text-decoration: none;
-          font-size: 0.78rem;
+          gap: 0.4rem;
+          padding: 0.6rem 1rem;
+          background: var(--ink);
+          color: var(--ivory);
+          border-radius: 999px;
+          font-size: 0.74rem;
           font-weight: 600;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-          transition: transform 0.24s ease, background 0.24s ease, color 0.24s ease, border-color 0.24s ease;
+          letter-spacing: 0.04em;
+          box-shadow: var(--shadow-md);
         }
+        .hero-tag svg { color: var(--gold); }
 
-        .primary-btn {
-          background: #f1d09a;
-          color: #17120f;
-          border: 1px solid #f1d09a;
+        /* ---------- SECTION SHELL ---------- */
+        .section {
+          padding: clamp(4rem, 9vw, 8rem) clamp(1.25rem, 5vw, 5rem);
         }
-
-        .primary-btn:hover,
-        .ghost-btn:hover,
-        .text-link:hover {
-          transform: translateY(-2px);
-        }
-
-        .ghost-btn {
-          color: var(--white);
-          border: 1px solid rgba(255,255,255,0.5);
-          background: rgba(255,255,255,0.08);
-        }
-
-        .showcase-section,
-        .look-section,
-        .signature-section,
-        .cta-section {
-          padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 5vw, 5rem);
-        }
+        .section-inner { max-width: 1240px; margin: 0 auto; }
 
         .section-head {
           display: flex;
           justify-content: space-between;
-          align-items: end;
+          align-items: flex-end;
           gap: 2rem;
-          max-width: 1240px;
-          margin: 0 auto 2rem;
+          margin-bottom: clamp(2rem, 4vw, 3.5rem);
         }
-
-        .section-kicker {
-          color: var(--rose);
-          margin-bottom: 0.7rem;
-        }
-
         .section-title {
-          font-family: 'Noto Serif Thai', serif;
-          font-size: clamp(2.25rem, 4.6vw, 4.5rem);
+          font-family: var(--font-serif);
           font-weight: 400;
-          line-height: 1.14;
-          margin: 0;
+          font-size: clamp(2.1rem, 4.4vw, 3.8rem);
+          line-height: 1.12;
+          margin: 0.8rem 0 0;
+          max-width: 14ch;
         }
-
-        .section-title em { color: var(--gold); font-style: italic; }
-
+        .section-title em { font-style: italic; color: var(--mocha); }
         .section-copy {
-          max-width: 490px;
-          color: var(--soft-ink);
-          line-height: 1.8;
+          max-width: 420px;
+          color: var(--soft);
+          line-height: 1.85;
           margin: 0;
         }
 
+        /* ---------- SERVICES ---------- */
+        .services {
+          background: var(--cream);
+        }
         .services-grid {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 18px;
-          max-width: 1240px;
-          margin: 0 auto;
+          grid-template-columns: repeat(3, 1fr);
+          gap: clamp(1rem, 2vw, 1.6rem);
         }
-
         .service-card {
+          background: var(--ivory);
+          border: 1px solid var(--line-soft);
+          border-radius: 20px;
+          overflow: hidden;
+          transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+        }
+        .service-card:hover {
+          transform: translateY(-6px);
+          box-shadow: var(--shadow-md);
+        }
+        .service-media {
           position: relative;
-          min-height: 610px;
+          aspect-ratio: 4 / 5;
           overflow: hidden;
-          border-radius: 8px;
-          background: #e8dfd2;
-          opacity: 0;
-          transform: translate3d(0, 34px, 0);
-          transition: opacity 0.8s ease, transform 0.8s ease;
+          background: var(--sand);
         }
-
-        .service-card::before,
-        .signature-image::before,
-        .look-preview::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(110deg, #dfd2c5 8%, #f2e8dc 18%, #dfd2c5 33%);
-          background-size: 200% 100%;
-          animation: imageSheen 1.1s linear infinite;
-          z-index: 0;
-        }
-
-        @keyframes imageSheen {
-          to { background-position-x: -200%; }
-        }
-
-        .service-card.reveal { opacity: 1; transform: translate3d(0, 0, 0); }
-
-        .service-card img {
-          width: 100%;
-          height: 100%;
+        .service-media img {
+          width: 100%; height: 100%;
           object-fit: cover;
-          position: absolute;
-          inset: 0;
-          transform: scale(1);
-          transition: transform 0.9s ease;
-          z-index: 1;
+          transition: transform 0.8s var(--ease);
         }
-
-        .service-card:hover img { transform: scale(1.045); }
-
-        .service-overlay-content {
-          position: absolute;
-          inset: 0;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-end;
-          padding: 1.4rem;
-          background: linear-gradient(to top, rgba(12,9,7,0.78), rgba(12,9,7,0.06) 62%);
-          color: white;
-          z-index: 2;
-        }
-
-        .service-panel {
-          border-top: 1px solid rgba(255,255,255,0.26);
-          padding-top: 1.1rem;
-        }
-
+        .service-card:hover .service-media img { transform: scale(1.06); }
         .service-eyebrow {
-          color: #f1d09a;
-          display: block;
-          margin-bottom: 0.65rem;
+          position: absolute;
+          top: 1rem; left: 1rem;
+          padding: 0.4rem 0.8rem;
+          background: rgba(250, 247, 242, 0.92);
+          border-radius: 999px;
+          font-size: 0.68rem;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--mocha-deep);
         }
-
-        .service-panel h3 {
-          font-family: 'Noto Serif Thai', serif;
-          font-size: clamp(1.85rem, 2.7vw, 2.75rem);
+        .service-body { padding: 1.5rem 1.5rem 1.7rem; }
+        .service-body h3 {
+          font-family: var(--font-serif);
           font-weight: 400;
-          line-height: 1.12;
-          margin: 0 0 0.75rem;
+          font-size: 1.65rem;
+          margin: 0 0 0.6rem;
         }
-
-        .service-panel p {
-          color: rgba(255,255,255,0.78);
-          line-height: 1.65;
-          margin: 0 0 1.1rem;
-          min-height: 78px;
+        .service-body p {
+          color: var(--soft);
+          line-height: 1.7;
+          font-size: 0.94rem;
+          margin: 0 0 1.2rem;
+          min-height: 64px;
         }
-
-        .text-link {
-          min-height: auto;
-          padding: 0;
-          color: white;
+        .service-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          color: var(--ink);
+          text-decoration: none;
+          font-size: 0.78rem;
+          font-weight: 600;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          transition: gap 0.3s var(--ease), color 0.3s var(--ease);
         }
+        .service-link:hover { gap: 0.8rem; color: var(--mocha-deep); }
 
-        .look-section {
-          background: #17120f;
-          color: white;
-          overflow: hidden;
+        /* ---------- LOOK STUDIO (dark) ---------- */
+        .look {
+          background: var(--ink);
+          color: var(--ivory);
         }
+        .look .section-title { color: var(--ivory); }
+        .look .section-copy { color: rgba(250, 247, 242, 0.66); }
+        .look .u-eyebrow { color: var(--gold); }
+        .look .u-eyebrow::before { background: var(--gold); }
 
-        .look-studio {
-          max-width: 1240px;
-          margin: 0 auto;
+        .look-grid {
           display: grid;
-          grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
-          gap: clamp(2rem, 6vw, 5rem);
+          grid-template-columns: 0.85fr 1.15fr;
+          gap: clamp(2rem, 5vw, 4rem);
           align-items: center;
         }
-
-        .look-section .section-copy {
-          color: rgba(255,255,255,0.72);
-          margin-top: 1rem;
-        }
-
-        .look-tabs {
-          display: grid;
-          gap: 0.8rem;
-          margin-top: 2rem;
-        }
-
+        .look-tabs { display: grid; gap: 0.8rem; margin-top: 2.2rem; }
         .look-tab {
           display: grid;
           grid-template-columns: auto 1fr auto;
-          gap: 0.9rem;
+          gap: 1rem;
           align-items: center;
           width: 100%;
-          padding: 1rem;
-          border: 1px solid rgba(255,255,255,0.16);
-          border-radius: 8px;
-          background: rgba(255,255,255,0.04);
-          color: white;
+          padding: 1.1rem 1.2rem;
+          border: 1px solid rgba(250, 247, 242, 0.14);
+          border-radius: 14px;
+          background: rgba(250, 247, 242, 0.03);
+          color: var(--ivory);
           cursor: pointer;
           text-align: left;
-          transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+          transition: background 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.3s var(--ease);
         }
-
-        .look-tab:hover,
-        .look-tab.is-active {
-          background: rgba(241,208,154,0.12);
-          border-color: rgba(241,208,154,0.45);
-          transform: translateX(4px);
+        .look-tab:hover, .look-tab.is-active {
+          background: rgba(194, 168, 120, 0.12);
+          border-color: rgba(194, 168, 120, 0.5);
+          transform: translateX(5px);
         }
-
-        .look-number {
-          font-family: 'Noto Serif Thai', serif;
-          color: #f1d09a;
-          font-size: 1.55rem;
+        .look-num {
+          font-family: var(--font-serif);
+          color: var(--gold);
+          font-size: 1.5rem;
           line-height: 1;
         }
-
         .look-tab strong {
           display: block;
-          font-family: 'Noto Serif Thai', serif;
-          font-size: 1.5rem;
+          font-family: var(--font-serif);
           font-weight: 400;
-          line-height: 1;
-          margin-bottom: 0.3rem;
+          font-size: 1.4rem;
+          line-height: 1.1;
+          margin-bottom: 0.25rem;
         }
-
-        .look-tab span:not(.look-number) {
-          color: rgba(255,255,255,0.66);
+        .look-tab small {
+          color: rgba(250, 247, 242, 0.6);
           font-size: 0.82rem;
         }
-
         .look-arrow {
-          color: rgba(255,255,255,0.42);
-          transition: transform 0.25s ease, color 0.25s ease;
+          color: rgba(250, 247, 242, 0.4);
+          transition: transform 0.3s var(--ease), color 0.3s var(--ease);
         }
-
-        .look-tab.is-active .look-arrow,
-        .look-tab:hover .look-arrow {
-          color: #f1d09a;
-          transform: translateX(3px);
+        .look-tab.is-active .look-arrow, .look-tab:hover .look-arrow {
+          color: var(--gold);
+          transform: translateX(4px);
         }
 
         .look-preview {
           position: relative;
-          min-height: 680px;
-          border-radius: 8px;
+          aspect-ratio: 3 / 4;
+          border-radius: 20px;
           overflow: hidden;
           background: #2c211d;
-          isolation: isolate;
         }
-
         .look-preview img {
           position: absolute;
           inset: 0;
-          width: 100%;
-          height: 100%;
+          width: 100%; height: 100%;
           object-fit: cover;
-          animation: lookFade 0.5s ease;
-          z-index: 1;
+          animation: lookFade 0.6s var(--ease);
         }
-
         @keyframes lookFade {
-          from { opacity: 0.35; transform: scale(1.035); }
+          from { opacity: 0.3; transform: scale(1.04); }
           to { opacity: 1; transform: scale(1); }
         }
-
         .look-preview::after {
           content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(to top, rgba(12,9,7,0.78), rgba(12,9,7,0.08) 58%);
-          z-index: 1;
+          position: absolute; inset: 0;
+          background: linear-gradient(to top, rgba(20,16,13,0.82), rgba(20,16,13,0.05) 58%);
         }
-
         .look-card {
           position: absolute;
-          left: 1.3rem;
-          right: 1.3rem;
-          bottom: 1.3rem;
+          left: 1.3rem; right: 1.3rem; bottom: 1.3rem;
           z-index: 2;
-          padding: 1.2rem;
-          border: 1px solid rgba(255,255,255,0.18);
-          border-radius: 8px;
-          background: rgba(23,18,15,0.62);
+          padding: 1.4rem;
+          border: 1px solid rgba(250, 247, 242, 0.16);
+          border-radius: 16px;
+          background: rgba(20, 16, 13, 0.5);
           backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
         }
-
-        .look-card h3 {
-          font-family: 'Noto Serif Thai', serif;
-          font-size: clamp(2rem, 3.6vw, 3.6rem);
-          font-weight: 400;
-          line-height: 1.12;
-          margin: 0 0 0.7rem;
-        }
-
-        .look-card p {
-          color: rgba(255,255,255,0.76);
-          line-height: 1.75;
-          margin: 0 0 1rem;
-        }
-
-        .look-swatches {
-          display: flex;
-          gap: 0.5rem;
-          margin-bottom: 1rem;
-        }
-
+        .look-swatches { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
         .look-swatch {
-          width: 28px;
-          height: 28px;
+          width: 26px; height: 26px;
           border-radius: 50%;
-          border: 1px solid rgba(255,255,255,0.42);
+          border: 1px solid rgba(250, 247, 242, 0.4);
         }
-
-        .floating-book {
-          position: fixed;
-          right: 1.2rem;
-          bottom: 1.2rem;
-          z-index: 45;
+        .look-card h3 {
+          font-family: var(--font-serif);
+          font-weight: 400;
+          font-size: clamp(1.7rem, 3vw, 2.4rem);
+          margin: 0 0 0.6rem;
+        }
+        .look-card p {
+          color: rgba(250, 247, 242, 0.74);
+          line-height: 1.7;
+          font-size: 0.92rem;
+          margin: 0 0 1.1rem;
+        }
+        .look-card a {
           display: inline-flex;
           align-items: center;
-          gap: 0.55rem;
-          min-height: 46px;
-          padding: 0 1rem;
-          border-radius: 999px;
-          background: #17120f;
-          color: white;
-          text-decoration: none;
-          font-size: 0.76rem;
+          gap: 0.45rem;
+          color: var(--gold);
+          font-size: 0.78rem;
           font-weight: 600;
-          letter-spacing: 0.04em;
+          letter-spacing: 0.05em;
           text-transform: uppercase;
-          box-shadow: 0 14px 34px rgba(23,18,15,0.24);
-          transition: transform 0.24s ease, background 0.24s ease;
+          text-decoration: none;
+          transition: gap 0.3s var(--ease);
         }
+        .look-card a:hover { gap: 0.8rem; }
 
-        .floating-book:hover {
-          transform: translateY(-3px);
-          background: #2a211c;
-        }
-
-        .signature-section {
-          background: var(--cream);
-        }
-
-        .signature-inner {
-          max-width: 1240px;
-          margin: 0 auto;
+        /* ---------- PROCESS ---------- */
+        .process-grid {
           display: grid;
-          grid-template-columns: 0.9fr 1.1fr;
-          gap: clamp(2rem, 6vw, 5rem);
+          grid-template-columns: repeat(3, 1fr);
+          gap: clamp(1.2rem, 3vw, 2.5rem);
+        }
+        .process-step {
+          padding-top: 1.6rem;
+          border-top: 2px solid var(--line);
+          transition: border-color 0.3s var(--ease);
+        }
+        .process-step:hover { border-color: var(--mocha); }
+        .process-no {
+          font-family: var(--font-serif);
+          font-size: 2.6rem;
+          color: var(--mocha);
+          line-height: 1;
+          margin-bottom: 1rem;
+        }
+        .process-step h3 {
+          font-family: var(--font-serif);
+          font-weight: 400;
+          font-size: 1.5rem;
+          margin: 0 0 0.7rem;
+        }
+        .process-step p {
+          color: var(--soft);
+          line-height: 1.75;
+          font-size: 0.95rem;
+          margin: 0;
+        }
+
+        /* ---------- SIGNATURE ---------- */
+        .signature { background: var(--cream); }
+        .signature-grid {
+          display: grid;
+          grid-template-columns: 0.95fr 1.05fr;
+          gap: clamp(2rem, 5vw, 4.5rem);
           align-items: center;
         }
-
-        .signature-image {
+        .signature-media {
           position: relative;
           aspect-ratio: 4 / 5;
-          border-radius: 8px;
+          border-radius: 20px;
           overflow: hidden;
-          background: #e3d8cc;
+          background: var(--sand);
+          box-shadow: var(--shadow-md);
         }
-
-        .signature-image img {
-          position: relative;
-          z-index: 1;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-
-        .proof-list {
-          display: grid;
-          gap: 0.9rem;
-          margin: 1.7rem 0 2rem;
-          padding: 0;
-          list-style: none;
-        }
-
+        .signature-media img { width: 100%; height: 100%; object-fit: cover; }
+        .proof-list { list-style: none; padding: 0; margin: 1.8rem 0 2.2rem; display: grid; gap: 1rem; }
         .proof-list li {
           display: flex;
-          gap: 0.8rem;
+          gap: 0.85rem;
           align-items: flex-start;
-          color: var(--soft-ink);
+          color: var(--soft);
           line-height: 1.65;
         }
-
-        .proof-list svg {
-          color: var(--rose);
+        .proof-check {
           flex: 0 0 auto;
-          margin-top: 0.25rem;
+          width: 26px; height: 26px;
+          border-radius: 50%;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(164, 120, 100, 0.14);
+          color: var(--mocha-deep);
+          font-size: 0.8rem;
+          margin-top: 0.1rem;
         }
 
-        .cta-section {
-          background: #17120f;
-          color: white;
+        /* ---------- QUOTE ---------- */
+        .quote {
+          background: var(--ink);
+          color: var(--ivory);
+          text-align: center;
+        }
+        .quote-inner { max-width: 880px; margin: 0 auto; }
+        .quote-stars {
+          display: inline-flex;
+          gap: 0.3rem;
+          color: var(--gold);
+          margin-bottom: 1.6rem;
+          font-size: 1rem;
+        }
+        .quote blockquote {
+          font-family: var(--font-serif);
+          font-weight: 400;
+          font-size: clamp(1.5rem, 3.4vw, 2.6rem);
+          line-height: 1.4;
+          margin: 0 0 1.8rem;
+        }
+        .quote blockquote em { font-style: italic; color: var(--gold); }
+        .quote cite {
+          font-style: normal;
+          color: rgba(250, 247, 242, 0.6);
+          font-size: 0.9rem;
+          letter-spacing: 0.04em;
         }
 
-        .cta-inner {
-          max-width: 1040px;
+        /* ---------- CTA ---------- */
+        .cta { padding: clamp(4rem, 9vw, 7rem) clamp(1.25rem, 5vw, 5rem); }
+        .cta-card {
+          max-width: 1100px;
           margin: 0 auto;
+          background: linear-gradient(135deg, #b58a72 0%, var(--mocha-deep) 100%);
+          border-radius: 28px;
+          padding: clamp(2.5rem, 6vw, 4.5rem);
+          color: var(--ivory);
           display: flex;
           justify-content: space-between;
           align-items: center;
-          gap: 2rem;
+          gap: 2.5rem;
+          box-shadow: var(--shadow-lg);
+        }
+        .cta-card h2 {
+          font-family: var(--font-serif);
+          font-weight: 400;
+          font-size: clamp(2rem, 4vw, 3.2rem);
+          line-height: 1.14;
+          margin: 0 0 0.9rem;
+          max-width: 16ch;
+        }
+        .cta-card p {
+          color: rgba(255, 255, 255, 0.84);
+          line-height: 1.75;
+          margin: 0;
+          max-width: 44ch;
         }
 
-        .cta-inner .section-copy {
-          color: rgba(255,255,255,0.74);
+        /* ---------- FLOATING BOOK ---------- */
+        .floating-book {
+          position: fixed;
+          right: 1.2rem; bottom: 1.2rem;
+          z-index: 50;
+          display: none;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0 1.3rem;
+          min-height: 52px;
+          border-radius: 999px;
+          background: var(--ink);
+          color: var(--ivory);
+          text-decoration: none;
+          font-size: 0.78rem;
+          font-weight: 600;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          box-shadow: var(--shadow-lg);
+          transition: transform 0.3s var(--ease), background 0.3s var(--ease);
         }
+        .floating-book:hover { transform: translateY(-3px); background: var(--mocha-deep); }
+        .floating-book svg { color: var(--gold); }
 
+        /* ---------- RESPONSIVE ---------- */
         @media (max-width: 980px) {
-          .hero-fullscreen {
-            align-items: end;
-            padding-inline: clamp(1.25rem, 4vw, 2.5rem);
-          }
-
-          .hero-content {
-            max-width: 620px;
-          }
-
-          .services-grid,
-          .look-studio,
-          .signature-inner {
+          .hero {
             grid-template-columns: 1fr;
+            gap: 2.5rem;
+            padding-top: clamp(6rem, 18vw, 8rem);
           }
-          .look-preview { min-height: 560px; }
-          .service-card { min-height: 520px; }
-          .section-head,
-          .cta-inner {
-            align-items: flex-start;
-            flex-direction: column;
-          }
-          .service-panel p { min-height: auto; }
+          .hero-visual { order: -1; max-width: 440px; }
+          .hero-frame { border-radius: 160px 160px 16px 16px; }
+          .services-grid { grid-template-columns: 1fr; max-width: 460px; margin: 0 auto; }
+          .look-grid, .signature-grid { grid-template-columns: 1fr; }
+          .signature-media { order: -1; max-width: 460px; }
+          .process-grid { grid-template-columns: 1fr; gap: 0; }
+          .process-step { padding: 1.4rem 0; border-top: none; border-bottom: 1px solid var(--line); }
+          .process-step:last-child { border-bottom: none; }
+          .section-head { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
+          .cta-card { flex-direction: column; align-items: flex-start; }
         }
 
-        @media (min-width: 641px) and (max-width: 980px) {
-          .showcase-section,
-          .look-section,
-          .signature-section,
-          .cta-section {
-            padding: 5rem clamp(1.5rem, 5vw, 3rem);
-          }
-
-          .services-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
-          .service-card {
-            min-height: 560px;
-          }
-
-          .service-card:nth-child(3) {
-            grid-column: 1 / -1;
-            min-height: 480px;
-          }
-
-          .look-preview {
-            min-height: 620px;
-          }
-
-          .signature-inner {
-            max-width: 760px;
-          }
-
-          .floating-book {
-            right: 1rem;
-            bottom: 1rem;
-          }
+        @media (max-width: 600px) {
+          .home { padding-bottom: 80px; }
+          .floating-book { display: inline-flex; left: 1rem; right: 1rem; justify-content: center; }
+          .hero-actions { width: 100%; }
+          .hero-actions .u-btn { flex: 1; }
+          .service-body p { min-height: 0; }
+          .hero-badge { left: 0.6rem; }
+          .cta-card { border-radius: 22px; }
+          .cta-card .u-btn { width: 100%; }
         }
-
-        @media (max-width: 640px) {
-          .home-page {
-            padding-bottom: 74px;
-          }
-
-          .hero-fullscreen {
-            align-items: end;
-            justify-items: stretch;
-            min-height: 100svh;
-            overflow: hidden;
-            padding: 92px 1rem 1.1rem;
-          }
-
-          .hero-bg-image {
-            object-position: 43% 16%;
-          }
-
-          .hero-overlay {
-            background:
-              linear-gradient(180deg, rgba(10,8,7,0.08) 0%, rgba(10,8,7,0.28) 34%, rgba(10,8,7,0.86) 100%),
-              linear-gradient(90deg, rgba(10,8,7,0.28), rgba(10,8,7,0.08));
-          }
-
-          .hero-content {
-            text-align: left;
-            margin-left: 0;
-            max-width: none;
-            padding: 0.2rem 0 0;
-          }
-
-          .hero-kicker {
-            justify-content: flex-start;
-            margin-bottom: 0.75rem;
-            font-size: 0.68rem;
-            color: rgba(255,255,255,0.78);
-          }
-
-          .hero-kicker::before { width: 30px; }
-
-          .hero-copy {
-            margin-left: 0;
-            max-width: 24rem;
-            margin-bottom: 1rem;
-          }
-
-          .hero-title {
-            max-width: 20rem;
-            font-size: clamp(2.25rem, 11vw, 3.35rem);
-            line-height: 1.08;
-            margin-bottom: 0.8rem;
-          }
-
-          .hero-copy { font-size: 0.94rem; }
-
-          .hero-actions {
-            display: grid;
-            grid-template-columns: 1fr;
-            align-items: stretch;
-            justify-content: stretch;
-            gap: 0.65rem;
-          }
-
-          .primary-btn,
-          .ghost-btn {
-            width: 100%;
-            min-height: 48px;
-            border-radius: 8px;
-          }
-
-          .showcase-section,
-          .look-section,
-          .signature-section,
-          .cta-section {
-            padding: 3.2rem 1rem;
-          }
-
-          .section-head {
-            gap: 0.9rem;
-            margin-bottom: 1.2rem;
-          }
-
-          .section-kicker {
-            font-size: 0.66rem;
-            margin-bottom: 0.45rem;
-          }
-
-          .section-title {
-            font-size: clamp(2rem, 10vw, 3rem);
-            line-height: 1.12;
-          }
-
-          .section-copy {
-            font-size: 0.94rem;
-            line-height: 1.75;
-          }
-
-          .services-grid {
-            gap: 0.9rem;
-          }
-
-          .service-card {
-            min-height: 460px;
-            border-radius: 10px;
-          }
-
-          .service-overlay-content {
-            padding: 1rem;
-          }
-
-          .service-panel h3 {
-            font-size: 2rem;
-          }
-
-          .service-panel p {
-            font-size: 0.92rem;
-            line-height: 1.65;
-          }
-
-          .look-studio {
-            gap: 1.25rem;
-          }
-
-          .look-tabs {
-            display: flex;
-            overflow-x: auto;
-            gap: 0.65rem;
-            margin: 1.25rem -1rem 0;
-            padding: 0 1rem 0.2rem;
-            scroll-snap-type: x proximity;
-            scrollbar-width: none;
-          }
-
-          .look-tabs::-webkit-scrollbar { display: none; }
-
-          .look-tab {
-            flex: 0 0 82%;
-            grid-template-columns: auto 1fr;
-            padding: 0.9rem;
-            scroll-snap-align: start;
-          }
-
-          .look-arrow { display: none; }
-
-          .look-preview {
-            min-height: 500px;
-            border-radius: 10px;
-          }
-
-          .look-card {
-            left: 0.85rem;
-            right: 0.85rem;
-            bottom: 0.85rem;
-            padding: 1rem;
-          }
-
-          .look-card h3 {
-            font-size: 2rem;
-          }
-
-          .signature-inner {
-            gap: 1.25rem;
-          }
-
-          .signature-image {
-            border-radius: 10px;
-          }
-
-          .proof-list {
-            gap: 0.75rem;
-            margin: 1.2rem 0 1.4rem;
-          }
-
-          .cta-inner {
-            gap: 1.1rem;
-          }
-
-          .floating-book {
-            left: 0.9rem;
-            right: 0.9rem;
-            bottom: 0.9rem;
-            min-height: 52px;
-            justify-content: center;
-            padding: 0 1rem;
-            border-radius: 10px;
-            background: #17120f;
-            font-size: 0.84rem;
-            box-shadow: 0 14px 32px rgba(23,18,15,0.28);
-          }
-        }
-
-        @media (max-width: 380px) {
-          .hero-fullscreen {
-            padding: 84px 0.85rem 0.9rem;
-          }
-
-          .hero-title {
-            font-size: clamp(2rem, 11vw, 2.65rem);
-          }
-
-          .hero-copy,
-          .section-copy,
-          .service-panel p,
-          .look-card p,
-          .proof-list li {
-            font-size: 0.88rem;
-          }
-
-          .primary-btn,
-          .ghost-btn {
-            min-height: 46px;
-            padding-inline: 0.8rem;
-            font-size: 0.74rem;
-          }
-
-          .service-card {
-            min-height: 420px;
-          }
-
-          .look-preview {
-            min-height: 460px;
-          }
-
-          .look-tab {
-            flex-basis: 90%;
-          }
+        @media (max-width: 400px) {
+          .hero-stats { gap: 1rem; }
+          .hero-stat + .hero-stat { padding-left: 1rem; }
         }
       `}</style>
 
-      <main className="home-page" ref={heroRef}>
-        <section className="hero-fullscreen">
-          <div className="hero-bg-wrapper">
-            <img
-              src={WomanImg1}
-              alt="Nokmakeupp professional makeup portfolio"
-              className="hero-bg-image"
-              decoding="async"
-              fetchPriority="high"
-              draggable="false"
-              onLoad={(event) => {
-                const decoded = event.currentTarget.decode?.();
-                if (decoded) decoded.finally(() => setHeroLoaded(true));
-                else setHeroLoaded(true);
-              }}
-              style={{ opacity: heroLoaded ? 1 : 0 }}
-            />
+      <main className="home" ref={pageRef}>
+        {/* HERO */}
+        <section className="hero">
+          <div className="reveal">
+            <span className="u-eyebrow hero-eyebrow">Nokmakeupp · Korat</span>
+            <h1 className="hero-title">
+              แต่งหน้าให้คุณ<br />
+              สวยอย่าง<em>เป็นธรรมชาติ</em>
+            </h1>
+            <p className="hero-copy">
+              ช่างแต่งหน้ามืออาชีพสำหรับเจ้าสาว ออกงาน และวันสำคัญ
+              เน้นงานผิวละมุน โครงหน้าชัด ถ่ายรูปขึ้นกล้อง และดูแพงแบบเป็นตัวคุณ
+            </p>
+            <div className="hero-actions">
+              <a href="https://lin.ee/aZQJ4JQ" target="_blank" rel="noreferrer" className="u-btn u-btn--primary">
+                <FiCalendar /> จองคิวผ่าน LINE
+              </a>
+              <Link to="/all" className="u-btn u-btn--ghost">
+                ดูผลงานทั้งหมด <FiArrowRight />
+              </Link>
+            </div>
+            <div className="hero-stats">
+              {stats.map((s) => (
+                <div className="hero-stat" key={s.label}>
+                  <span className="hero-stat-value serif">{s.value}</span>
+                  <span className="hero-stat-label">{s.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="hero-overlay" />
 
-          <div>
-            <div className="hero-content">
-              <span className="hero-kicker">Nokmakeupp Korat</span>
-              <h1 className="hero-title">Makeup that feels <em>beautiful</em> in real life</h1>
-              <p className="hero-copy">
-                แต่งหน้ามืออาชีพสำหรับเจ้าสาว ออกงาน และวันสำคัญ เน้นงานผิวละมุน โครงหน้าชัด
-                ถ่ายรูปขึ้นกล้อง และดูแพงแบบไม่เกินตัว
-              </p>
-              <div className="hero-actions">
-                <a href="https://lin.ee/aZQJ4JQ" target="_blank" rel="noreferrer" className="primary-btn">
-                  <FiCalendar /> จองคิวผ่าน LINE
-                </a>
-                <a href="#work" className="ghost-btn">
-                  ดูผลงาน <FiArrowRight />
-                </a>
+          <div className="hero-visual reveal">
+            <div className="hero-frame">
+              <img
+                src={HeroImg}
+                alt="Nokmakeupp professional makeup"
+                className={heroLoaded ? 'loaded' : ''}
+                decoding="async"
+                fetchPriority="high"
+                draggable="false"
+                onLoad={(e) => {
+                  const d = e.currentTarget.decode?.();
+                  if (d) d.finally(() => setHeroLoaded(true));
+                  else setHeroLoaded(true);
+                }}
+              />
+            </div>
+            <span className="hero-tag"><FiStar /> Bridal Specialist</span>
+            <div className="hero-badge">
+              <span className="hero-badge-dot" />
+              <div>
+                <strong>เปิดรับคิวแล้ว</strong>
+                <span>ตอบกลับเร็วทาง LINE</span>
               </div>
             </div>
-
           </div>
         </section>
 
-        <section className="showcase-section" id="work">
-          <div className="section-head">
-            <div>
-              <p className="section-kicker">Selected services</p>
-              <h2 className="section-title">Choose your <em>occasion</em></h2>
+        {/* SERVICES */}
+        <section className="section services">
+          <div className="section-inner">
+            <div className="section-head">
+              <div>
+                <span className="u-eyebrow">Services</span>
+                <h2 className="section-title">เลือกลุคตาม<em>โอกาส</em>ของคุณ</h2>
+              </div>
+              <p className="section-copy">
+                เลือกดูผลงานตามโอกาส เพื่อเทียบสไตล์งานผิว งานตา และความติดทนก่อนตัดสินใจจองคิว
+              </p>
             </div>
-            <p className="section-copy">
-              เลือกดูผลงานตามโอกาส เพื่อเทียบสไตล์งานผิว งานตา และความติดทนก่อนตัดสินใจจองคิว
-            </p>
-          </div>
 
-          <div className="services-grid">
-            {services.map((service, index) => (
-              <article className="service-card scroll-reveal" style={{ transitionDelay: `${index * 0.12}s` }} key={service.title}>
-                <img src={service.image} alt={service.title} loading={index === 0 ? 'eager' : 'lazy'} decoding="async" draggable="false" />
-                <div className="service-overlay-content">
-                  <div className="service-panel">
+            <div className="services-grid">
+              {services.map((service, index) => (
+                <article
+                  className="service-card reveal"
+                  style={{ transitionDelay: `${index * 0.1}s` }}
+                  key={service.title}
+                >
+                  <div className="service-media">
+                    <img src={service.image} alt={service.title} loading="lazy" decoding="async" draggable="false" />
                     <span className="service-eyebrow">{service.eyebrow}</span>
+                  </div>
+                  <div className="service-body">
                     <h3>{service.title}</h3>
                     <p>{service.copy}</p>
-                    <Link to={service.to} className="text-link">ดูผลงาน <FiArrowRight /></Link>
+                    <Link to={service.to} className="service-link">
+                      ดูผลงาน <FiArrowUpRight />
+                    </Link>
                   </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="look-section">
-          <div className="look-studio">
-            <div className="scroll-reveal">
-              <p className="section-kicker">Interactive look studio</p>
-              <h2 className="section-title">ลองเลือก <em>mood</em> ก่อนจอง</h2>
+        {/* LOOK STUDIO */}
+        <section className="section look">
+          <div className="section-inner look-grid">
+            <div className="reveal">
+              <span className="u-eyebrow">Look Studio</span>
+              <h2 className="section-title">ลองเลือก <em>mood</em><br />ก่อนจองคิว</h2>
               <p className="section-copy">
-                เลือกโทนที่ใกล้กับสไตล์ที่ชอบ แล้วส่งชื่อ mood ผ่าน LINE เพื่อให้ช่วยแนะนำลุคที่เข้ากับชุดและวันงานได้เร็วขึ้น
+                เลือกโทนที่ใกล้กับสไตล์ที่ชอบ แล้วส่งชื่อ mood ผ่าน LINE
+                เพื่อให้ช่วยแนะนำลุคที่เข้ากับชุดและวันงานได้เร็วขึ้น
               </p>
 
               <div className="look-tabs">
-                {lookMoods.map((look, index) => (
+                {lookMoods.map((item, index) => (
                   <button
-                    className={`look-tab ${activeLook === index ? 'is-active' : ''}`}
                     type="button"
-                    key={look.name}
+                    key={item.name}
+                    className={`look-tab ${activeLook === index ? 'is-active' : ''}`}
                     onClick={() => setActiveLook(index)}
                   >
-                    <span className="look-number">0{index + 1}</span>
+                    <span className="look-num">0{index + 1}</span>
                     <span>
-                      <strong>{look.name}</strong>
-                      {look.tone}
+                      <strong>{item.name}</strong>
+                      <small>{item.tone}</small>
                     </span>
                     <FiArrowRight className="look-arrow" />
                   </button>
@@ -1033,17 +825,17 @@ const Home = () => {
               </div>
             </div>
 
-            <div className="look-preview scroll-reveal">
-              <img src={lookMoods[activeLook].image} alt={lookMoods[activeLook].name} loading="lazy" decoding="async" draggable="false" />
+            <div className="look-preview reveal">
+              <img src={look.image} alt={look.name} key={look.name} loading="lazy" decoding="async" draggable="false" />
               <div className="look-card">
                 <div className="look-swatches" aria-hidden="true">
-                  {lookMoods[activeLook].colors.map((color) => (
+                  {look.colors.map((color) => (
                     <span className="look-swatch" style={{ background: color }} key={color} />
                   ))}
                 </div>
-                <h3>{lookMoods[activeLook].name}</h3>
-                <p>{lookMoods[activeLook].copy}</p>
-                <a href="https://lin.ee/aZQJ4JQ" target="_blank" rel="noreferrer" className="text-link">
+                <h3>{look.name}</h3>
+                <p>{look.copy}</p>
+                <a href="https://lin.ee/aZQJ4JQ" target="_blank" rel="noreferrer">
                   ส่ง mood นี้ให้ช่าง <FiMessageCircle />
                 </a>
               </div>
@@ -1051,45 +843,92 @@ const Home = () => {
           </div>
         </section>
 
-        <section className="signature-section">
-          <div className="signature-inner">
-            <div className="signature-image scroll-reveal">
+        {/* PROCESS */}
+        <section className="section">
+          <div className="section-inner">
+            <div className="section-head">
+              <div>
+                <span className="u-eyebrow">How it works</span>
+                <h2 className="section-title">จองง่าย ใน <em>3 ขั้นตอน</em></h2>
+              </div>
+              <p className="section-copy">
+                ขั้นตอนเรียบง่าย ตั้งแต่ปรึกษาลุคจนถึงวันงานจริง เพื่อให้คุณสบายใจและพร้อมสวยในวันสำคัญ
+              </p>
+            </div>
+
+            <div className="process-grid">
+              {steps.map((step, index) => (
+                <div className="process-step reveal" style={{ transitionDelay: `${index * 0.1}s` }} key={step.no}>
+                  <div className="process-no">{step.no}</div>
+                  <h3>{step.title}</h3>
+                  <p>{step.copy}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* SIGNATURE */}
+        <section className="section signature">
+          <div className="section-inner signature-grid">
+            <div className="signature-media reveal">
               <img src={WomanImg2} alt="Soft bridal makeup detail" loading="lazy" decoding="async" draggable="false" />
             </div>
-            <div className="signature-copy scroll-reveal">
-              <p className="section-kicker">Why book with us</p>
-              <h2 className="section-title">ลุคสวยที่คิดมาให้ครบตั้งแต่หน้าเว็บจนถึงวันจริง</h2>
-              <p className="section-copy">
-                ลูกค้าแต่ละคนมีโทนผิว สไตล์ชุด และความมั่นใจไม่เหมือนกัน เราจึงคุยลุคก่อนจอง
-                เพื่อให้ผลลัพธ์ออกมาสวย ดูมืออาชีพ และใช้งานได้จริงตลอดงาน
+            <div className="reveal">
+              <span className="u-eyebrow">Why book with us</span>
+              <h2 className="section-title">ลุคที่คิดมาให้ครบ<br />ตั้งแต่ปรึกษา<em>จนถึงวันจริง</em></h2>
+              <p className="section-copy" style={{ maxWidth: 'none' }}>
+                ลูกค้าแต่ละคนมีโทนผิว สไตล์ชุด และความมั่นใจไม่เหมือนกัน
+                เราจึงคุยลุคก่อนจอง เพื่อให้ผลลัพธ์ออกมาสวย ดูมืออาชีพ และใช้งานได้จริงตลอดงาน
               </p>
               <ul className="proof-list">
                 {proofPoints.map((point) => (
-                  <li key={point}><FiCheckCircle /> <span>{point}</span></li>
+                  <li key={point}>
+                    <span className="proof-check"><FiCheck /></span>
+                    <span>{point}</span>
+                  </li>
                 ))}
               </ul>
-              <a href="https://lin.ee/aZQJ4JQ" target="_blank" rel="noreferrer" className="primary-btn">
+              <a href="https://lin.ee/aZQJ4JQ" target="_blank" rel="noreferrer" className="u-btn u-btn--primary">
                 สอบถามราคาและคิวว่าง <FiArrowRight />
               </a>
             </div>
           </div>
         </section>
 
-        <section className="cta-section">
-          <div className="cta-inner">
+        {/* QUOTE */}
+        <section className="section quote">
+          <div className="quote-inner reveal">
+            <span className="quote-stars">
+              <FiStar /><FiStar /><FiStar /><FiStar /><FiStar />
+            </span>
+            <blockquote>
+              “แต่งหน้าสวยมากค่ะ งานผิวเนียน ติดทนทั้งวันงาน
+              <em> ถ่ายรูปออกมาดูแพงสุด ๆ</em> ประทับใจมากจริง ๆ”
+            </blockquote>
+            <cite>— รีวิวจากเจ้าสาว Nokmakeupp</cite>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="cta">
+          <div className="cta-card reveal">
             <div>
-              <p className="section-kicker">Ready for your date</p>
-              <h2 className="section-title">ส่งวันงานมาได้เลย เดี๋ยวช่วยดูคิวให้</h2>
-              <p className="section-copy">แนะนำแจ้งวันที่ สถานที่ จำนวนคน และลุคที่ชอบ เพื่อประเมินราคาได้แม่นขึ้น</p>
+              <h2>พร้อมสวยในวันสำคัญของคุณแล้วหรือยัง?</h2>
+              <p>
+                แจ้งวันงาน สถานที่ จำนวนคน และลุคที่ชอบ เพื่อให้เราช่วยเช็กคิวและประเมินราคาได้แม่นยำขึ้น
+              </p>
             </div>
-            <a href="https://lin.ee/aZQJ4JQ" target="_blank" rel="noreferrer" className="primary-btn">
-              จองคิวตอนนี้ <FiCalendar />
+            <a href="https://lin.ee/aZQJ4JQ" target="_blank" rel="noreferrer" className="u-btn u-btn--light">
+              <FiCalendar /> จองคิวตอนนี้
             </a>
           </div>
         </section>
 
+        <Footer />
+
         <a href="https://lin.ee/aZQJ4JQ" target="_blank" rel="noreferrer" className="floating-book">
-          <FiHeart /> จองคิว
+          <FiMessageCircle /> จองคิว
         </a>
       </main>
     </>
