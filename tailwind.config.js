@@ -2,8 +2,8 @@ export default {
   content: ['./index.html', './src/**/*.{html,js,jsx}'],
   theme: {
     fontFamily: {
-      primary: ['Noto Serif Thai', 'serif'],
-      secondary: ['Noto Sans Thai', 'sans-serif'],
+      serif: ['Noto Serif Thai', 'serif'],
+      sans: ['Noto Sans Thai', 'sans-serif'],
     },
     screens: {
       sm: '640px',
@@ -13,10 +13,12 @@ export default {
     },
     extend: {
       colors: {
-        primary: '#0E1112',
-        grey: '#484B4B',
-
-        accent: '#EEF7F9',
+        ivory: '#faf7f2',
+        cream: '#f1ebe1',
+        ink: '#211c18',
+        soft: '#6e6258',
+        mocha: '#a47864',
+        gold: '#c2a878',
       },
     },
   },

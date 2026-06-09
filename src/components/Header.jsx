@@ -2,59 +2,49 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Socials from './Socials';
 import MobileNav from './MobileNav';
-import LogoImg from '../img/header/nok.svg'; 
+import LogoImg from '../img/header/nok.svg';
+
+const navLinks = [
+  { to: '/', label: 'Home' },
+  { to: '/wedding', label: 'Wedding' },
+  { to: '/daily', label: 'Daily' },
+  { to: '/all', label: 'Portfolio' },
+];
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const isHomeTop = location.pathname === '/' && !scrolled;
-  const foreground = isHomeTop ? '#ffffff' : '#1a1410';
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 40);
-    };
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 32);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const navLinks = [
-    { to: '/', label: 'Home' },
-    { to: '/wedding', label: 'Wedding Makeup' },
-    { to: '/daily', label: 'Daily Makeup' },
-    { to: '/all', label: 'All Makeup' },
-  ];
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap');
-
         .site-header {
           position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          z-index: 50;
-          width: 100%;
-          transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+          inset: 0 0 auto 0;
+          z-index: 60;
           display: flex;
           align-items: center;
-        }
-
-        .site-header.is-initial {
-          height: 100px;
-          background: transparent;
-          padding: 0 4rem;
+          height: 96px;
+          padding: 0 clamp(1rem, 4vw, 3.5rem);
+          transition: height 0.45s var(--ease), background 0.45s var(--ease),
+            box-shadow 0.45s var(--ease), border-color 0.45s var(--ease);
+          border-bottom: 1px solid transparent;
         }
 
         .site-header.is-scrolled {
-          height: 80px;
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-          padding: 0 4rem;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+          height: 72px;
+          background: rgba(250, 247, 242, 0.82);
+          backdrop-filter: blur(16px) saturate(1.1);
+          -webkit-backdrop-filter: blur(16px) saturate(1.1);
+          box-shadow: 0 10px 40px rgba(33, 28, 24, 0.06);
+          border-color: var(--line-soft);
         }
 
         .header-inner {
@@ -62,41 +52,43 @@ const Header = () => {
           align-items: center;
           justify-content: space-between;
           width: 100%;
-          max-width: 1400px;
+          max-width: 1320px;
           margin: 0 auto;
-          min-width: 0;
         }
 
         .brand-link {
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          min-width: 0;
-          flex: 0 1 auto;
+          flex: 0 0 auto;
         }
 
         .brand-logo {
-          width: min(176px, 48vw);
-          height: auto;
+          width: auto;
+          height: 40px;
+          transition: height 0.45s var(--ease);
         }
+        .is-scrolled .brand-logo { height: 34px; }
 
         .desktop-nav {
           display: none;
-          gap: 3rem;
+          align-items: center;
+          gap: clamp(1.6rem, 3vw, 2.8rem);
         }
         @media (min-width: 1024px) {
           .desktop-nav { display: flex; }
         }
 
         .nav-item {
-          font-family: 'Noto Sans Thai', sans-serif;
-          font-size: 0.78rem;
-          font-weight: 500;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          color: var(--nav-color);
-          text-decoration: none;
-          transition: all 0.3s ease;
           position: relative;
+          font-family: var(--font-sans);
+          font-size: 0.78rem;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: var(--ink);
+          text-decoration: none;
+          padding: 0.4rem 0;
+          transition: color 0.3s var(--ease);
         }
 
         .nav-item::after {
@@ -104,84 +96,51 @@ const Header = () => {
           position: absolute;
           left: 0;
           right: 0;
-          bottom: -0.45rem;
-          height: 1px;
-          background: #b89a6a;
+          bottom: 0;
+          height: 1.5px;
+          background: var(--mocha);
           transform: scaleX(0);
-          transform-origin: center;
-          transition: transform 0.25s ease;
+          transform-origin: left center;
+          transition: transform 0.32s var(--ease);
         }
 
-        .nav-item:hover, .nav-item.active {
-          color: #b89a6a;
-        }
+        .nav-item:hover,
+        .nav-item.active { color: var(--mocha-deep); }
 
-        .nav-item:hover::after, .nav-item.active::after {
-          transform: scaleX(1);
-        }
+        .nav-item:hover::after,
+        .nav-item.active::after { transform: scaleX(1); }
 
-        /* ส่วนควบคุม Right Section ให้เรียงตัวแนวนอน */
-        .header-right-box {
+        .header-right {
           display: flex;
           align-items: center;
-          gap: 1.5rem;
+          gap: 1.4rem;
+          flex: 0 0 auto;
         }
 
-        @media (max-width: 1024px) {
-          .site-header.is-initial, .site-header.is-scrolled {
-            padding: 0 1.5rem;
-            height: 70px;
-          }
+        .header-divider {
+          width: 1px;
+          height: 22px;
+          background: var(--line);
         }
 
-        @media (max-width: 640px) {
-          .site-header.is-initial, .site-header.is-scrolled {
-            height: 64px;
-            padding: 0 0.9rem;
-          }
-
-          .site-header.is-scrolled {
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 8px 24px rgba(23, 18, 15, 0.08);
-          }
-
-          .header-right-box {
-            gap: 0.5rem;
-            flex: 0 0 auto;
-          }
-
-          .brand-logo {
-            width: min(168px, 52vw);
-          }
+        @media (max-width: 1023px) {
+          .site-header { height: 76px; }
+          .site-header.is-scrolled { height: 64px; }
+          .brand-logo { height: 36px; }
+          .is-scrolled .brand-logo { height: 32px; }
         }
 
-        @media (max-width: 360px) {
-          .site-header.is-initial, .site-header.is-scrolled {
-            padding: 0 0.7rem;
-          }
-
-          .brand-logo {
-            width: 145px;
-          }
+        @media (max-width: 480px) {
+          .brand-logo { height: 32px; }
         }
       `}</style>
 
-      <header className={`site-header ${scrolled ? 'is-scrolled' : 'is-initial'}`} style={{ '--nav-color': foreground }}>
+      <header className={`site-header ${scrolled ? 'is-scrolled' : ''}`}>
         <div className="header-inner">
-          
-          {/* 1. LOGO */}
-          <Link to="/" className="brand-link">
-            <img 
-              src={LogoImg} 
-              alt="Logo" 
-              className={`brand-logo transition-all duration-500 object-contain ${scrolled ? 'h-[35px]' : 'h-[42px]'}`}
-              width="176"
-              height="38"
-              style={{ filter: isHomeTop ? 'brightness(0) invert(1)' : 'none' }}
-            />
+          <Link to="/" className="brand-link" aria-label="Nokmakeupp home">
+            <img src={LogoImg} alt="Nokmakeupp" className="brand-logo" width="176" height="40" />
           </Link>
 
-          {/* 2. CENTER: NAV (แสดงเฉพาะคอมพิวเตอร์) */}
           <nav className="desktop-nav">
             {navLinks.map((link) => (
               <Link
@@ -194,21 +153,24 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* 3. RIGHT SECTION (Socials & MobileNav) */}
-          <div className="header-right-box">
-            
-            {/* Socials: บังคับ Flex-Row แนวนอน และซ่อนบนมือถือ */}
+          <div className="header-right">
             <div className="hidden lg:flex items-center">
-              <Socials color={foreground} />
+              <Socials />
             </div>
-
-            {/* Mobile Navigation: แสดงเฉพาะมือถือ และซ่อนบนคอมพิวเตอร์ (lg:hidden) */}
+            <span className="header-divider hidden lg:block" />
+            <a
+              href="https://lin.ee/aZQJ4JQ"
+              target="_blank"
+              rel="noreferrer"
+              className="u-btn u-btn--primary hidden lg:inline-flex"
+              style={{ minHeight: '42px', padding: '0 1.2rem', fontSize: '0.72rem' }}
+            >
+              จองคิว
+            </a>
             <div className="lg:hidden flex items-center">
-              <MobileNav color={foreground} />
+              <MobileNav />
             </div>
-
           </div>
-
         </div>
       </header>
     </>
